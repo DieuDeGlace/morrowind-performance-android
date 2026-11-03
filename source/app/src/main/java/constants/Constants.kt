@@ -53,11 +53,11 @@ object Constants {
     // e.g. /data/user/0/com.ast.openmw/files/config
     var GLOBAL_CONFIG = ""
 
-    // User config directory below USER_FILE_STORAGE.
-    // e.g. .../Android/data/com.ast.openmw/files/OpenMW/config
+    // Active user configuration directory, normally Documents/OpenMW-Performance/config.
+    // The app-owned config directory remains the fallback until shared storage is available.
     var USER_CONFIG = ""
 
-    // User-editable OpenMW config below USER_CONFIG.
+    // User-editable OpenMW config in the selected USER_CONFIG directory.
     var USER_OPENMW_CFG = ""
 
     // Contains app version code for currently deployed internal resources.

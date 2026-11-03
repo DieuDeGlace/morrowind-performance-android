@@ -582,8 +582,7 @@ class GameActivity : SDLActivity() {
     override fun getArguments(): Array<String> {
         val cmd = PreferenceManager.getDefaultSharedPreferences(this).getString("commandLine", "") ?: ""
         val resourcesPath = selectRuntimeResourcesPath()
-        val commandlineParser = CommandlineParser("--resources $resourcesPath $cmd")
-        return commandlineParser.argv
+        return parser.LaunchArguments.build(resourcesPath, Constants.USER_CONFIG, cmd)
     }
 
     private external fun getPathToJni(path_global: String, path_user: String)

@@ -40,6 +40,7 @@ class ModsAdapter() : RecyclerView.Adapter<ModsAdapter.ModViewHolder>() {
 
     lateinit var touchHelper: ItemTouchHelper
     lateinit var collection: ModsCollection
+    var onRowLongClick: ((Mod) -> Unit)? = null
 
     /**
      * A row representation of a mod
@@ -59,6 +60,9 @@ class ModsAdapter() : RecyclerView.Adapter<ModsAdapter.ModViewHolder>() {
     override fun onBindViewHolder(holder: ModViewHolder, position: Int) {
         val mod = collection.mods[position]
         holder.mTitle.text = mod.filename
+        holder.rowView.setOnLongClickListener {
+            onRowLongClick?.let { callback -> callback(mod); true } ?: false
+        }
         holder.mHandle.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 touchHelper.startDrag(holder)

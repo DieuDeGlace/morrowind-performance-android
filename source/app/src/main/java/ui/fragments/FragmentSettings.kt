@@ -83,6 +83,7 @@ class FragmentSettings : PreferenceFragment(), OnSharedPreferenceChangeListener 
         addPreferencesFromResource(R.xml.settings)
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
+        ui.storage.StorageUi.bindPreferences(this)
         prepareControllerTriggerPreference()
         updateGammaState()
         updateHandheldState()
@@ -557,6 +558,7 @@ class FragmentSettings : PreferenceFragment(), OnSharedPreferenceChangeListener 
 
     override fun onResume() {
         super.onResume()
+        ui.storage.StorageUi.refresh(this)
         for (i in 0 until preferenceScreen.preferenceCount) {
             val preference = preferenceScreen.getPreference(i)
             if (preference is PreferenceGroup) {
@@ -573,7 +575,8 @@ class FragmentSettings : PreferenceFragment(), OnSharedPreferenceChangeListener 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         if (key == null)
             return
-        updatePreference(findPreference(key), key)
+        findPreference(key)?.let { updatePreference(it, key) }
+        ui.storage.StorageUi.refresh(this)
         updateGammaState()
         if (key == Constants.HANDHELD_MODE) {
             // The handheld controls rely on controller menus; they can still be turned off.

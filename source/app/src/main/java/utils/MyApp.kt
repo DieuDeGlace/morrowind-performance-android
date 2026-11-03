@@ -83,8 +83,9 @@ class MyApp : Application() {
 
         // With the canonical applicationId com.ast.openmw this normally resolves to:
         // /storage/emulated/0/Android/data/com.ast.openmw/files/OpenMW
-        Constants.USER_CONFIG = File(userRoot, "config").absolutePath
-        Constants.USER_OPENMW_CFG = File(userRoot, "config/openmw.cfg").absolutePath
+        Constants.USER_CONFIG = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString(file.SharedConfig.PREF_PATH, "").orEmpty().ifBlank { File(userRoot, "config").absolutePath }
+        Constants.USER_OPENMW_CFG = File(Constants.USER_CONFIG, "openmw.cfg").absolutePath
 
         Constants.DEFAULTS_BIN = File(filesDir, "config/defaults.bin").absolutePath
         Constants.OPENMW_CFG = File(filesDir, "config/openmw.cfg").absolutePath

@@ -30,7 +30,8 @@ import java.util.Locale
 class ModsCollection(
     private val type: ModType,
     private val dataFiles: ArrayList<String>,
-    private val db: ModsDatabaseOpenHelper
+    private val db: ModsDatabaseOpenHelper,
+    private val directories: List<String>? = null
 ) {
     val mods = arrayListOf<Mod>()
 
@@ -45,6 +46,7 @@ class ModsCollection(
             initDb()
         }
 
+        if (type == ModType.Dir && directories != null) migrateDirectoryNames()
         syncWithFs(type)
 
         // The database might have become empty (e.g. if user deletes all mods) after the FS sync.
@@ -58,7 +60,7 @@ class ModsCollection(
      */
     private fun isEmpty(): Boolean {
         val database = db.readableDatabase
-        database.rawQuery("SELECT count(1) FROM mod", null).use { cursor ->
+        database.rawQuery("SELECT count(1) FROM mod WHERE type IN (1, 2)", null).use { cursor ->
             return !cursor.moveToFirst() || cursor.getInt(0) == 0
         }
     }
@@ -96,6 +98,29 @@ class ModsCollection(
     /**
      * Synchronizes state of mods in database with the actual mod files on disk.
      */
+    private fun migrateDirectoryNames() {
+        val database = db.writableDatabase
+        val oldNames = mutableListOf<String>()
+        database.query("mod", arrayOf("filename"), "type = ?",
+            arrayOf(ModType.Dir.v.toString()), null, null, null).use { cursor ->
+            while (cursor.moveToNext()) {
+                val name = cursor.getString(0)
+                if (!File(name).isAbsolute) oldNames += name
+            }
+        }
+        database.beginTransaction()
+        try {
+            oldNames.forEach { old ->
+                val path = ModDirectoryLayout.dataDirectory(File(dataFiles.first(), old)).path
+                database.execSQL("UPDATE OR IGNORE mod SET filename = ? WHERE type = ? AND filename = ?",
+                    arrayOf(path, ModType.Dir.v, old))
+                // If an absolute row already existed, keep its state instead.
+                database.delete("mod", "type = ? AND filename = ?", arrayOf(ModType.Dir.v.toString(), old))
+            }
+            database.setTransactionSuccessful()
+        } finally { database.endTransaction() }
+    }
+
     private fun syncWithFs(type: ModType) {
         val database = db.writableDatabase
         val dbMods = mutableListOf<Mod>()
@@ -116,8 +141,12 @@ class ModsCollection(
 
         val fsNames = mutableSetOf<String>()
 
-        dataFiles.forEach { dataPath ->
-            val modFiles = File(dataPath).listFiles()?.filter {
+        var allLocationsReadable = true
+        if (type == ModType.Dir && directories != null) fsNames.addAll(directories)
+        else dataFiles.forEach { dataPath ->
+            val entries = File(dataPath).listFiles()
+            if (entries == null) allLocationsReadable = false
+            val modFiles = entries?.filter {
                 when (type) {
                     ModType.Dir -> it.isDirectory
                     else -> it.isFile && extensions.contains(it.extension.lowercase(Locale.ROOT))
@@ -155,7 +184,7 @@ class ModsCollection(
         val dbNames = dbMods.mapTo(mutableSetOf()) { it.filename }
 
         // Mods present in both the DB and on disk.
-        dbMods.filter { fsNames.contains(it.filename) }.forEach {
+        dbMods.filter { fsNames.contains(it.filename) || !allLocationsReadable }.forEach {
             mods.add(it)
         }
 
@@ -173,7 +202,7 @@ class ModsCollection(
         database.beginTransaction()
         try {
             // Delete mods which remain in the DB but no longer exist on disk.
-            (dbNames - fsNames).forEach {
+            (if (allLocationsReadable) dbNames - fsNames else emptySet()).forEach {
                 database.delete(
                     "mod",
                     "type = ? AND filename = ?",

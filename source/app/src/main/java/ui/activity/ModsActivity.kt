@@ -21,6 +21,10 @@ package ui.activity
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.Menu
+import android.app.AlertDialog
+import android.widget.Toast
+import ui.storage.StorageUi
 import android.widget.ViewFlipper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -76,6 +80,18 @@ class ModsActivity : AppCompatActivity() {
         setupModList(findViewById(R.id.list_groundcovers), ModType.Groundcover)
 
         updateModList()
+        mDirAdapter.onRowLongClick = { mod ->
+            AlertDialog.Builder(this).setTitle(R.string.performance_remove_mod_folder)
+                .setMessage(mod.filename)
+                .setPositiveButton(R.string.performance_remove_mod_folder) { _, _ ->
+                    try {
+                        persistLists()
+                        ModsPaths.removeDirectory(this, mod.filename)
+                        refreshLists()
+                        Toast.makeText(this, R.string.performance_mod_folder_removed, Toast.LENGTH_LONG).show()
+                    } catch (error: Exception) { StorageUi.showError(this, error) }
+                }.setNegativeButton(android.R.string.cancel, null).show()
+        }
     }
 
     override fun onDestroy() {
@@ -115,15 +131,48 @@ class ModsActivity : AppCompatActivity() {
             ModType.Groundcover -> mGroundcoverAdapter
         }
 
-        adapter.collection = ModsCollection(type, dataFilesList, database)
+        adapter.collection = if (type == ModType.Dir) ModsPaths.directoryCollection(this, database)
+            else ModsCollection(type, dataFilesList, database)
         val touchHelper = ItemTouchHelper(ModMoveCallback(adapter))
         touchHelper.attachToRecyclerView(list)
         adapter.touchHelper = touchHelper
         list.adapter = adapter
     }
 
+    private fun persistLists() {
+        listOf(mPluginAdapter, mResourceAdapter, mDirAdapter, mGroundcoverAdapter).forEach { it.collection.update() }
+    }
+
+    private fun refreshLists() {
+        mDirAdapter.collection = ModsPaths.directoryCollection(this, database)
+        updateModList()
+        listOf(mPluginAdapter, mResourceAdapter, mDirAdapter, mGroundcoverAdapter).forEach { it.notifyDataSetChanged() }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menu.add(0, 1001, 0, R.string.performance_add_mod_folder)
+            .setIcon(android.R.drawable.ic_input_add).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            1001 -> {
+                AlertDialog.Builder(this).setTitle(R.string.performance_add_mod_folder)
+                    .setMessage(R.string.performance_mod_folder_help)
+                    .setPositiveButton(R.string.performance_browse) { _, _ ->
+                        StorageUi.chooseDirectory(this) { selected ->
+                            try {
+                                persistLists()
+                                ModsPaths.addDirectory(this, selected)
+                                refreshLists()
+                                findViewById<TabLayout>(R.id.tabLayout).getTabAt(2)?.select()
+                                Toast.makeText(this, R.string.performance_mod_folder_added, Toast.LENGTH_LONG).show()
+                            } catch (error: Exception) { StorageUi.showError(this, error) }
+                        }
+                    }.setNegativeButton(android.R.string.cancel, null).show()
+                true
+            }
             android.R.id.home -> {
                 onBackPressed()
                 true

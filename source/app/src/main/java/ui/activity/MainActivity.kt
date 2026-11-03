@@ -501,8 +501,14 @@ class MainActivity : AppCompatActivity() {
         // base Data Files directory and additional data directories enabled by
         // the user; disabled directories must not leak plugins into the launch.
         val db = ModsDatabaseOpenHelper.getInstance(this)
-        val allDataFilesList = ModsPaths.allDataDirectories(this)
-        val activeDataFilesList = ModsPaths.activeDataDirectories(this, db)
+        val directoryLists = try {
+            ModsPaths.allDataDirectories(this) to ModsPaths.activeDataDirectories(this, db)
+        } catch (error: Exception) {
+            revealLauncherAfterSkipGui("mod storage unavailable")
+            ui.storage.StorageUi.showError(this, error)
+            return
+        }
+        val (allDataFilesList, activeDataFilesList) = directoryLists
         val plugins = ModsCollection(ModType.Plugin, allDataFilesList, db)
         if (plugins.mods.count { it.enabled && ModsPaths.fileExistsIn(it.filename, activeDataFilesList) } == 0) {
             // No mods enabled, show a warning
@@ -941,7 +947,7 @@ class MainActivity : AppCompatActivity() {
      * Resets user config to default values by removing it
      */
     private fun removeUserConfig() {
-        deleteRecursive(File(Constants.USER_CONFIG))
+        file.ConfigDirectoryCopier.resetKnownFiles(File(Constants.USER_CONFIG))
     }
 
     /**
@@ -2256,6 +2262,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 // Never write into the user storage while the legacy tree is moved there.
                 MyApp.app.awaitLegacyUserStorageMigration()
+                file.SharedConfig.ensureForLaunch(this@MainActivity)
                 File(Constants.USER_FILE_STORAGE).mkdirs()
 
                 // Reinstall static files if their version mismatches OR if an older

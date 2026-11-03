@@ -21,6 +21,12 @@ package permission
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.ActivityNotFoundException
+import android.net.Uri
+import android.os.Environment
+import android.provider.Settings
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
@@ -29,6 +35,22 @@ import com.libopenmw.openmw.BuildConfig
 
 object PermissionHelper {
     const val STORAGE_PERMISSION_REQUEST = 23
+
+    fun hasSharedStorageAccess(context: Context): Boolean =
+        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) ||
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+
+    fun requestSharedStorageAccess(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                activity.startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:${activity.packageName}")))
+            } catch (_: ActivityNotFoundException) {
+                activity.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+            }
+        } else getWriteExternalStoragePermission(activity)
+    }
 
     /**
      * The Mobile flavor keeps the port's existing targetSdk 29 legacy-storage
@@ -44,13 +66,11 @@ object PermissionHelper {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return true
 
-        return ContextCompat.checkSelfPermission(
-            activity,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
+        return hasSharedStorageAccess(activity)
     }
 
     fun getWriteExternalStoragePermission(activity: Activity) {
+        if (hasSharedStorageAccess(activity)) return
         if (BuildConfig.IS_AUTOMOTIVE_BUILD && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
             return
 

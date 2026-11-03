@@ -1,81 +1,73 @@
-/*
-    Copyright (C) 2026 OpenMW-Android contributors
-
-    This file is part of OpenMW-Android.
-
-    OpenMW-Android is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-*/
-
 package mods
 
 import android.content.Context
+import android.preference.PreferenceManager
 import file.GameInstaller
 import java.io.File
+import java.io.IOException
 
-/** Shared path handling for the launcher mod manager and openmw.cfg writer. */
+/** Registered mod folders stay separate from the base game and survive missing SD cards. */
 object ModsPaths {
+    private const val PREF_DIRECTORIES = "performance_mod_directories"
+    private const val PREF_IMPORTED = "performance_mod_directories_imported"
 
-    /** Root directory that contains the game's Data Files directory. */
-    fun gameRoot(ctx: Context): File {
-        val dataFiles = GameInstaller.getDataFilesFile(ctx)
-        return dataFiles.parentFile ?: File("")
+    fun gameRoot(ctx: Context): File = GameInstaller.getDataFilesFile(ctx).parentFile ?: File("")
+    fun directoryRoots(ctx: Context): ArrayList<String> = arrayListOf(gameRoot(ctx).absolutePath)
+
+    fun extraDirectories(ctx: Context): ArrayList<String> {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(ctx)
+        if (!preferences.getBoolean(PREF_IMPORTED, false)) {
+            val siblings = gameRoot(ctx).listFiles()
+            if (siblings != null) {
+                val imported = ModDirectoryLayout.registeredPaths(
+                    GameInstaller.getDataFilesFile(ctx),
+                    siblings.filter { it.isDirectory }.map { it.path }
+                )
+                if (!preferences.edit().putString(PREF_DIRECTORIES, imported.joinToString("\n"))
+                        .putBoolean(PREF_IMPORTED, true).commit())
+                    throw IOException("Could not save the mod folder list.")
+            }
+        }
+        return preferences.getString(PREF_DIRECTORIES, "").orEmpty().lines()
+            .filter { it.isNotBlank() }.distinct().toCollection(arrayListOf())
     }
 
-    /** Path list used by the Directories tab. */
-    fun directoryRoots(ctx: Context): ArrayList<String> =
-        arrayListOf(gameRoot(ctx).absolutePath)
+    fun directoryCollection(ctx: Context, db: ModsDatabaseOpenHelper = ModsDatabaseOpenHelper.getInstance(ctx)) =
+        ModsCollection(ModType.Dir, directoryRoots(ctx), db, extraDirectories(ctx))
 
-    /**
-     * Returns the base Data Files directory plus every additional directory
-     * next to it. This is used by the mod manager so enable/load-order state
-     * is preserved even while an additional data directory is disabled.
-     */
-    fun allDataDirectories(ctx: Context): ArrayList<String> {
-        val dataFiles = GameInstaller.getDataFilesFile(ctx)
-        val result = arrayListOf(dataFiles.absolutePath)
-        val root = dataFiles.parentFile ?: return result
+    fun allDataDirectories(ctx: Context): ArrayList<String> =
+        (listOf(GameInstaller.getDataFilesFile(ctx).canonicalPath) + extraDirectories(ctx))
+            .distinct().toCollection(arrayListOf())
 
-        root.listFiles()
-            ?.asSequence()
-            ?.filter { it.isDirectory }
-            ?.filterNot { it.absoluteFile == dataFiles.absoluteFile }
-            ?.mapTo(result) { it.absolutePath }
-
-        return result
-    }
-
-    /**
-     * Returns the base Data Files directory plus only additional data
-     * directories that are enabled in the launcher.
-     */
-    fun activeDataDirectories(
-        ctx: Context,
-        db: ModsDatabaseOpenHelper = ModsDatabaseOpenHelper.getInstance(ctx)
-    ): ArrayList<String> {
-        val dataFiles = GameInstaller.getDataFilesFile(ctx)
-        val result = arrayListOf(dataFiles.absolutePath)
-        val root = dataFiles.parentFile ?: return result
-
-        val directories = ModsCollection(
-            ModType.Dir,
-            arrayListOf(root.absolutePath),
-            db
+    fun activeDataDirectories(ctx: Context, db: ModsDatabaseOpenHelper = ModsDatabaseOpenHelper.getInstance(ctx)):
+        ArrayList<String> = ModDirectoryLayout.activePaths(
+            GameInstaller.getDataFilesFile(ctx),
+            directoryCollection(ctx, db).mods.map { it.filename to it.enabled }
         )
 
-        directories.mods
-            .asSequence()
-            .filter { it.enabled }
-            .map { File(root, it.filename) }
-            .filter { it.isDirectory }
-            .mapTo(result) { it.absolutePath }
-
-        return result
+    fun addDirectory(ctx: Context, selected: File) {
+        val path = ModDirectoryLayout.validate(selected, GameInstaller.getDataFilesFile(ctx)).path
+        val paths = extraDirectories(ctx)
+        if (path !in paths) paths += path
+        if (!PreferenceManager.getDefaultSharedPreferences(ctx).edit()
+                .putString(PREF_DIRECTORIES, paths.joinToString("\n")).commit())
+            throw IOException("Could not save the mod folder list.")
+        val collection = directoryCollection(ctx)
+        collection.mods.first { it.filename == path }.apply { enabled = true; dirty = true }
+        collection.update()
     }
 
-    /** Returns true if [filename] is present in at least one active data directory. */
+    /** Only unregisters a path; no mod files are changed or deleted. */
+    fun removeDirectory(ctx: Context, path: String) {
+        val paths = extraDirectories(ctx).filterNot { it == path }
+        if (!PreferenceManager.getDefaultSharedPreferences(ctx).edit()
+                .putString(PREF_DIRECTORIES, paths.joinToString("\n")).commit())
+            throw IOException("Could not save the mod folder list.")
+        ModsDatabaseOpenHelper.getInstance(ctx).writableDatabase.delete(
+            "mod", "type = ? AND filename = ?", arrayOf(ModType.Dir.v.toString(), path)
+        )
+    }
+
     fun fileExistsIn(filename: String, dataDirectories: Collection<String>): Boolean =
         dataDirectories.any { File(it, filename).isFile }
 }

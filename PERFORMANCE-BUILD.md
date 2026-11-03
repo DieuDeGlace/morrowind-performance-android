@@ -17,3 +17,16 @@ The engine source is published on the `codex/android-0.51-performance` branch of
 This app uses `com.dieudeglace.openmw.performance`, so it can be installed alongside the original port. Your own Morrowind data is required. Release signing credentials are kept outside Git in the local `.signing` folder and as GitHub Actions secrets; the APK contains the public signing certificate. Retain the local signing files for future updates.
 
 Build verification does not substitute for testing gameplay and graphics on a physical Android device. No device-specific FPS claim is made.
+
+
+## Separate mod folders and shared configuration (0.51.0-17)
+
+Open Mods and use **Add mod folder** (+). Select a folder containing the mod's meshes, textures, scripts or plugins. A package with a `Data Files` child is accepted too. Folders may be outside the Morrowind directory or on accessible SD storage; no files are copied into the vanilla game. The Directories tab enables/disables folders and sets their order by dragging. Folders lower in the list override earlier folders. Enable ESP/ESM plugins in the Plugins tab. Long-press a directory to unregister it without deleting its files.
+
+Previously detected sibling mod folders and their enable/load-order state are imported on upgrade. Folder identities use full paths, so separate mods with the same folder name stay separate. If an enabled folder is disconnected, launch is blocked with its path rather than silently dropping mods. Disabled/offline entries keep their stored state.
+
+The default editable configuration is `Documents/OpenMW-Performance/config` in shared storage. With shared storage permission it is prepared on the next game start. **Settings and config folder** can choose that default or another accessible folder. Existing `settings.cfg`, user `openmw.cfg`, bindings, shader settings and Lua settings are copied without removing the originals; existing files in the destination win. Saves and the engine resource cache keep their current location. Configuration reset affects only known OpenMW config files and never recursively deletes a shared folder or unrelated documents.
+
+On Android 11+, **Shared storage access** opens Android's All files access page when needed. Grant access and return to the launcher; root is not required. This uses Android's [documented direct file access](https://developer.android.com/training/data-storage/manage-all-files). Use ordinary shared folders such as Documents or an SD-card folder rather than another app's Android/data directory.
+
+Close the game before editing the shared files. The selected user `openmw.cfg` is loaded after the generated launcher config. The old app-private user-config location is excluded to prevent loading the copied options twice. Launcher-managed controls such as shadows, occlusion culling and resolution still apply at launch; other manual settings, including `[Camera] viewing distance`, remain in the shared `settings.cfg`.
