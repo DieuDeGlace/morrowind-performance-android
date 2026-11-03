@@ -23,6 +23,7 @@ if [[ "$phase" != "sign" ]]; then
     test -s "$native_library"
     sha256sum "$native_library" > buildscripts/openmw-051-patch39-libopenmw.sha256
     cp -R app/src/main/bundled-android-assets/android_omwfx app/src/main/assets/
+    cp -R app/src/main/bundled-android-assets/libopenmw/. app/src/main/assets/libopenmw/
     cp buildscripts/performance-engine.json app/src/main/assets/libopenmw/openmw/performance-engine.json
     
     # Include the preserved culling implementation's distribution notices.
