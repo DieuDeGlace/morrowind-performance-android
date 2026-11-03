@@ -22,13 +22,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential gcc-multilib g++-multilib autoconf automake libtool gettext cmake pkg-config patch unzip zip p7zip-full python3 curl wget
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;26.1.10909125'
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
+        id: native-cache
         with:
           path: |
             source/buildscripts/downloads
             source/buildscripts/toolchain
             source/buildscripts/prefix
             source/buildscripts/build
+          restore-keys: android-arm64-native-v1-
           key: android-arm64-native-v1-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/include/**') }}
       - uses: actions/cache@v4
         with:
@@ -60,3 +62,12 @@ jobs:
             source/buildscripts/performance-native-build.log
             source/app/build/reports/tests
             source/app/build/outputs/logs
+      - uses: actions/cache/save@v4
+        if: always() && steps.native-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            source/buildscripts/downloads
+            source/buildscripts/toolchain
+            source/buildscripts/prefix
+            source/buildscripts/build
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
