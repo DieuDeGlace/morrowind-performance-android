@@ -22,13 +22,16 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Install native build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential gcc-multilib g++-multilib autoconf automake libtool gettext cmake pkg-config patch unzip zip p7zip-full python3 curl wget
       - name: Install APK SDK packages
         if: ${{ !inputs.dependencies_only }}
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;26.1.10909125' 
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;26.1.10909125'
       - uses: actions/cache/restore@v4
         id: native-cache
         with:
