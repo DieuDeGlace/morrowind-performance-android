@@ -8,8 +8,8 @@ apply plugin: 'kotlin-android'
  * calibrated OMWFX chain together behind one build-time verification gate.
  */
 
-def openMwVersionCode = 5115
-def openMwAndroidVersionName = '0.51.0-15-performance'
+def openMwVersionCode = 5116
+def openMwAndroidVersionName = '0.51.0-16-performance'
 def versionFile = new File(
         project.rootDir,
         'app/src/main/assets/libopenmw/resources/version'
@@ -93,6 +93,18 @@ tasks.register('verifyOpenMwPayload') {
             )
         }
 
+        // Scalar options cannot repeat within one config file. The Android
+        // template owns user-data; the generated engine template also has it.
+        def baseConfig = file('src/main/assets/libopenmw/openmw/openmw.base.cfg')
+                .readLines('UTF-8').collect { it.trim() }
+        def userDataEntries = baseConfig.findAll { it ==~ /user-data\s*=.*/ }
+        if (userDataEntries.size() != 1) {
+            throw new GradleException('Android base config must contain exactly one user-data entry; found ' + userDataEntries.size())
+        }
+        if (!baseConfig.any { it ==~ /data\s*=.*resources\/vfs-mw.*/ }) {
+            throw new GradleException('Android base config lost the engine resources/vfs-mw data directory.')
+        }
+
         def performancePin = new File(project.rootDir, 'buildscripts/performance-engine.json').getText('UTF-8').trim()
         def bundledPerformancePin = file('src/main/assets/libopenmw/openmw/performance-engine.json').getText('UTF-8').trim()
         if (performancePin != bundledPerformancePin) {
@@ -152,9 +164,9 @@ tasks.register('verifyOpenMwPayload') {
             )
         }
 
-        if (openMwVersionCode != 5115 || calculateVersion() != '0.51.0-15-performance') {
+        if (openMwVersionCode != 5116 || calculateVersion() != '0.51.0-16-performance') {
             throw new GradleException(
-                    'OpenMW Android final release identity must be versionName 0.51.0-15-performance and versionCode 5115.'
+                    'OpenMW Android final release identity must be versionName 0.51.0-16-performance and versionCode 5116.'
             )
         }
 

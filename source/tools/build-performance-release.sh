@@ -14,6 +14,7 @@ test -n "$sdk_root"
 build_tools="$sdk_root/build-tools/35.0.0"
 
 if [[ "$phase" != "sign" ]]; then
+    python3 tools/test-android-base-config.py
     chmod +x gradlew buildscripts/build.sh buildscripts/include/*.sh
     (
         cd buildscripts
@@ -54,7 +55,7 @@ fi
 : "${ANDROID_KEY_ALIAS:=openmw-performance}"
 release_root="$project_root/../release"
 mkdir -p "$release_root"
-apk_name='OpenMW-Android-0.51.0-15-performance-arm64.apk'
+apk_name='OpenMW-Android-0.51.0-16-performance-arm64.apk'
 unsigned='app/build/outputs/apk/mainline/release/app-mainline-release-unsigned.apk'
 test -s "$unsigned"
 "$build_tools/zipalign" -p -f 4 "$unsigned" "$release_root/aligned.apk"

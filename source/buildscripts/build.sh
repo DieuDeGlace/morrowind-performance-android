@@ -229,12 +229,10 @@ if [[ $DEPLOY_RESOURCES = "true" ]]; then
 	mkdir -p "$DST/openmw/"
 	cp "$SRC/defaults.bin" "$DST/openmw/"
 	cp "$SRC/gamecontrollerdb.txt" "$DST/openmw/"
-	# OpenMW 0.51 adds an engine-owned data path for resources/vfs-mw.
-	# Do not strip every data= line as the old CaveBros pipeline did; remove
-	# only data-local and preserve the internal vfs-mw entry. MainActivity
-	# rewrites it to the writable Android resource mirror at runtime.
-	grep -v '^data-local=' "$SRC/openmw.cfg" >> "$DST/openmw/openmw.base.cfg"
-	cat "$DIR/../app/openmw.base.cfg" >> "$DST/openmw/openmw.base.cfg"
+	# Preserve OpenMW 0.51's internal VFS data path, while Android supplies
+	# the single user-data setting. Repeating that scalar makes startup fail.
+	bash "$DIR/include/compose-android-config.sh" \
+	    "$SRC/openmw.cfg" "$DIR/../app/openmw.base.cfg" "$DST/openmw/openmw.base.cfg"
 
 	# Immutable engine marker consumed by app/build.gradle. Prevents accidentally
 	# packaging a stale pre-0.51 libopenmw.so after this upgrade.
