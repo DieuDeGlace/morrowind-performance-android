@@ -86,5 +86,5 @@ PY
     sha256sum "$apk_name" > "$apk_name.sha256"
 )
 cp buildscripts/performance-engine.json "$release_root/ENGINE-PROVENANCE.json"
-printf 'App commit %s\nNative build Release, ARM64, LTO\n' "$(git rev-parse HEAD)" > "$release_root/BUILD-INFO.txt"
+printf 'App commit %s\nNative build Release, ARM64, ThinLTO (2 backends)\n' "$(git rev-parse HEAD)" > "$release_root/BUILD-INFO.txt"
 echo "Release ready: $release_root/$apk_name"

@@ -10,7 +10,7 @@ Engine settings now include Software occlusion culling (enabled by default for t
 
 ## Build and provenance
 
-The Android Performance Release workflow builds the native ARM64 engine from the exact archive and SHA-256 recorded in `source/buildscripts/performance-engine.json`, builds a non-debuggable Release APK, verifies its ABI and newly compiled engine bytes, and signs it. `source/tools/build-performance-release.sh` performs the same steps on Linux with JDK 17, Android SDK 35, NDK r26b, and the native build dependencies listed in the workflow.
+The Android Performance Release workflow builds the native ARM64 engine from the exact archive and SHA-256 recorded in `source/buildscripts/performance-engine.json`, uses ThinLTO with two linker backends to limit memory use, builds a non-debuggable Release APK, verifies its ABI and newly compiled engine bytes, and signs it. `source/tools/build-performance-release.sh` performs the same steps on Linux with JDK 17, Android SDK 35, NDK r26b, and the native build dependencies listed in the workflow.
 
 The engine source is published on the `codex/android-0.51-performance` branch of DieuDeGlace/morrowind-performance. All existing Android compatibility patches are included directly in that source. The five bundled OMWFX shader files are retained from the upstream 0.51.0-14 APK; their provenance and original credits are included in `bundled-android-assets`.
 

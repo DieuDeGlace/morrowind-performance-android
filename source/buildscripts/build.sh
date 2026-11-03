@@ -22,7 +22,7 @@ usage() {
 	echo "	--arch: build for specified architecture [arm, arm64, x86_64, x86] (default: arm)"
 	echo "	--asan: build with AddressSanitizer enabled"
 	echo "	--no-resources: don't deploy the resources (used in full-build.sh)"
-	echo "	--lto: use LTO for linking"
+	echo "	--lto: use ThinLTO for linking (LTO_JOBS defaults to 2)"
 	echo "	--jobs N: limit parallel build jobs (default: all detected CPUs)"
 	echo "	--ccache: use ccache to speed up repeated builds"
 	echo "	--debug: produce a debug build without optimizations"
@@ -104,10 +104,14 @@ else
 fi
 
 if [[ $LTO = "true" ]]; then
-	CFLAGS="$CFLAGS -flto"
-	CXXFLAGS="$CXXFLAGS -flto"
+	# Preserve cross-module optimization without merging the entire engine into
+	# one memory-heavy LLVM module. Limit parallel backends on CI runners.
+	LTO_JOBS="${LTO_JOBS:-2}"
+	[[ "$LTO_JOBS" =~ ^[1-9][0-9]*$ ]] || { echo 'Invalid LTO_JOBS' >&2; exit 2; }
+	CFLAGS="$CFLAGS -flto=thin"
+	CXXFLAGS="$CXXFLAGS -flto=thin"
 	# emulated-tls should not be needed in ndk r18 https://github.com/android-ndk/ndk/issues/498#issuecomment-327825754
-	LDFLAGS="$LDFLAGS -flto -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld"
+	LDFLAGS="$LDFLAGS -flto=thin -Wl,--thinlto-jobs=$LTO_JOBS -Wl,--thinlto-cache-dir=$DIR/build/$ARCH/thinlto-cache -Wl,-plugin-opt=-emulated-tls -fuse-ld=lld"
 fi
 
 if [[ $ARCH = "arm" ]]; then

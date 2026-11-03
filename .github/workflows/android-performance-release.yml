@@ -40,8 +40,12 @@ jobs:
             source/buildscripts/toolchain
             source/buildscripts/prefix
             source/buildscripts/build
-          restore-keys: android-arm64-native-v1-
-          key: android-arm64-native-v1-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/include/**') }}
+          restore-keys: |
+            android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**') }}-${{ inputs.dependencies_only && 'deps' || 'engine' }}-
+            android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**') }}-
+            android-arm64-native-v2-
+            android-arm64-native-v1-
+          key: android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**') }}-${{ inputs.dependencies_only && 'deps' || 'engine' }}-${{ github.run_id }}-${{ github.run_attempt }}
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
@@ -52,10 +56,30 @@ jobs:
         run: |
           chmod +x build.sh include/*.sh
           ./build.sh --arch arm64 --release --lto --jobs 4 --deps-only 2>&1 | tee performance-native-build.log
+      - name: Provide linker memory headroom
+        if: ${{ !inputs.dependencies_only }}
+        run: |
+          free -h
+          df -h /mnt
+          available_mb=$(df -Pm /mnt | awk 'NR == 2 {print $4}')
+          if (( available_mb > 12288 )); then
+            sudo fallocate -l 8G /mnt/openmw-performance.swap
+            sudo chmod 600 /mnt/openmw-performance.swap
+            sudo mkswap /mnt/openmw-performance.swap
+            sudo swapon /mnt/openmw-performance.swap
+          fi
       - name: Build and verify ARM64 Release APK
         if: ${{ !inputs.dependencies_only }}
         working-directory: source
-        run: bash tools/build-performance-release.sh 4 build
+        run: |
+          (while sleep 60; do
+            echo "Native build memory at $(date -u +%T)"
+            free -h
+            ps -C ld.lld -o pid,rss,etime,comm || true
+          done) &
+          memory_monitor=$!
+          trap 'kill "$memory_monitor" 2>/dev/null || true' EXIT
+          bash tools/build-performance-release.sh 4 build
       - name: Prepare release signing key
         if: ${{ !inputs.dependencies_only }}
         env:
