@@ -8,8 +8,8 @@ apply plugin: 'kotlin-android'
  * calibrated OMWFX chain together behind one build-time verification gate.
  */
 
-def openMwVersionCode = 5114
-def openMwAndroidVersionName = '0.51.0-14'
+def openMwVersionCode = 5115
+def openMwAndroidVersionName = '0.51.0-15-performance'
 def versionFile = new File(
         project.rootDir,
         'app/src/main/assets/libopenmw/resources/version'
@@ -93,6 +93,12 @@ tasks.register('verifyOpenMwPayload') {
             )
         }
 
+        def performancePin = new File(project.rootDir, 'buildscripts/performance-engine.json').getText('UTF-8').trim()
+        def bundledPerformancePin = file('src/main/assets/libopenmw/openmw/performance-engine.json').getText('UTF-8').trim()
+        if (performancePin != bundledPerformancePin) {
+            throw new GradleException('The performance native engine payload is stale. Rebuild it first.')
+        }
+
         def engineMarkerFile = file('src/main/assets/libopenmw/openmw/openmw-engine-version.txt')
         def engineMarker = engineMarkerFile.getText('UTF-8').replace('\r\n', '\n').trim()
         def requiredFinalCommit = 'f4bec41444214a7903bebd178389ca22ca13f646'
@@ -146,9 +152,9 @@ tasks.register('verifyOpenMwPayload') {
             )
         }
 
-        if (openMwVersionCode != 5114 || calculateVersion() != '0.51.0-14') {
+        if (openMwVersionCode != 5115 || calculateVersion() != '0.51.0-15-performance') {
             throw new GradleException(
-                    'OpenMW Android final release identity must be versionName 0.51.0-14 and versionCode 5114.'
+                    'OpenMW Android final release identity must be versionName 0.51.0-15-performance and versionCode 5115.'
             )
         }
 
@@ -743,7 +749,7 @@ android {
         // Both flavors intentionally use the same installed package name. Google Play
         // can therefore serve the appropriate artifact per form factor while the
         // shared OpenMW user-data path remains stable.
-        applicationId "com.ast.openmw"
+        applicationId "com.dieudeglace.openmw.performance"
 
         versionCode openMwVersionCode
         versionName calculateVersion()

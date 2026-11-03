@@ -52,10 +52,10 @@ set(LZ4_HASH SHA256=030644df4611007ff7dc962d981f390361e6c97a34e5cbc393ddfbe019ff
 set(LUAJIT_VERSION 505e2c03de35e2718eef0d2d3660712e06dadf1f)
 set(LUAJIT_HASH SHA256=409f7fe570d3c16558e594421c47bdd130238323c9d6fd6c83dedd2aaeb082a8)
 
-# OpenMW 0.51.0 Final Android runtime gate â€” immutable commit behind tag openmw-0.51.0
-set(OPENMW_VERSION f4bec41444214a7903bebd178389ca22ca13f646)
-# ExternalProject currently does not enforce OPENMW_HASH; keep the commit immutable instead.
-set(OPENMW_HASH "")
+# OpenMW 0.51 Android performance engine, including the current mobile compatibility patches.
+set(OPENMW_VERSION e49b43d56f6d64768429a592dda631eb9a513506)
+# Verify the immutable performance engine archive before compiling.
+set(OPENMW_HASH SHA256=254389528f71c46a6f64fcad88a92147ff497111299c979c63ea28f47d86ffa4)
 
 # https://github.com/unicode-org/icu/
 set(LIBICU_VERSION 70-1)
@@ -184,7 +184,7 @@ ExternalProject_Add(libicu
 )
 
 ExternalProject_Add(libpng
-        URL http://prdownloads.sourceforge.net/libpng/libpng-${LIBPNG_VERSION}.tar.xz
+        URL https://prdownloads.sourceforge.net/libpng/libpng-${LIBPNG_VERSION}.tar.xz
 #        URL_HASH ${LIBPNG_HASH}
         DOWNLOAD_DIR ${download_dir}
 
@@ -276,7 +276,7 @@ BUILD_IN_SOURCE 1
 )
 
 ExternalProject_Add(ffmpeg
-        URL http://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2
+        URL https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2
         #URL_HASH ${FFMPEG_HASH}
         DOWNLOAD_DIR ${download_dir}
 
@@ -602,22 +602,13 @@ set(OPENMW_COMMON
         -DSDL2_DIR=${prefix}/lib/cmake/SDL2
 )
 
-set(OPENMW_PATCH
-        patch -d <SOURCE_DIR> -p1 -t -N < ${CMAKE_SOURCE_DIR}/patches/openmw051-final/0001-ndk-r26-stringstream-compat.patch &&
-        patch -d <SOURCE_DIR> -p1 -t -N < ${CMAKE_SOURCE_DIR}/patches/openmw051-final/0002-static-osg-link.patch &&
-        python3 ${CMAKE_SOURCE_DIR}/patches/openmw051-final/apply-ndk-r26-format.py <SOURCE_DIR> &&
-        python3 ${CMAKE_SOURCE_DIR}/patches/openmw051-final/apply-android-runtime-baseline.py <SOURCE_DIR> &&
-        python3 ${CMAKE_SOURCE_DIR}/patches/openmw051-final/apply-android-gl4es-core-inline.py <SOURCE_DIR> &&
-        python3 ${CMAKE_SOURCE_DIR}/patches/openmw051-final/apply-android-graphics-followup.py <SOURCE_DIR> &&
-        python3 ${CMAKE_SOURCE_DIR}/patches/openmw051-final/apply-android-graphics-followup2.py <SOURCE_DIR> &&
-        python3 ${CMAKE_SOURCE_DIR}/patches/openmw051-final/apply-android-graphics-followup3.py <SOURCE_DIR> &&
-        python3 ${CMAKE_SOURCE_DIR}/patches/openmw051-final/apply-android-graphics-followup4.py <SOURCE_DIR>
-)
+# The pinned engine source already includes the Android compatibility patches.
+set(OPENMW_PATCH "")
 ExternalProject_Add(openmw
         DEPENDS boost openal osg mygui ffmpeg sdl2 bullet lz4 luajit libicu
 
-        URL https://github.com/OpenMW/openmw/archive/${OPENMW_VERSION}.tar.gz
-        #URL_HASH ${OPENMW_HASH}
+        URL https://github.com/DieuDeGlace/morrowind-performance/archive/${OPENMW_VERSION}.tar.gz
+        URL_HASH ${OPENMW_HASH}
         DOWNLOAD_DIR ${download_dir}
 
         PATCH_COMMAND ${OPENMW_PATCH}

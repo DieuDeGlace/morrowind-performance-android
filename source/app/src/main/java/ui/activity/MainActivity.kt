@@ -1651,6 +1651,8 @@ class MainActivity : AppCompatActivity() {
             "Shadows",
             linkedMapOf(
                 "enable shadows" to if (prefs.getBoolean("gs_enable_shadows", false)) "true" else "false",
+                "shadow update interval" to (prefs.getString("gs_shadow_update_interval", "2")
+                    ?.toIntOrNull()?.coerceIn(1, 4) ?: 2).toString(),
                 "player shadows" to if (prefs.getBoolean("gs_player_shadows", true)) "true" else "false",
                 "actor shadows" to if (prefs.getBoolean("gs_actor_shadows", true)) "true" else "false",
                 "object shadows" to if (prefs.getBoolean("gs_object_shadows", true)) "true" else "false",
@@ -2049,6 +2051,14 @@ class MainActivity : AppCompatActivity() {
             linkedMapOf(
                 "doppler factor" to if (dopplerEnabled) "0.25" else "0.0",
                 "camera listener" to if (cameraListener) "true" else "false"
+            )
+        )
+
+        updateSettingsSection(
+            settingsFile,
+            "Camera",
+            linkedMapOf(
+                "occlusion culling" to if (prefs.getBoolean("gs_occlusion_culling", true)) "true" else "false"
             )
         )
 

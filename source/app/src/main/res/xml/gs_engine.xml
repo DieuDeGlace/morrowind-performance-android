@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/l10n_gs_engine_engine_title">
+        <CheckBoxPreference android:key="gs_occlusion_culling" android:title="@string/performance_occlusion_title" android:summary="@string/performance_occlusion_summary" android:defaultValue="true" />
         <CheckBoxPreference android:key="gs_groundcover_enabled" android:title="@string/gs_groundcover_handling_title" android:summary="@string/gs_groundcover_handling_summary" android:defaultValue="false" />
         <Preference android:key="gs_groundcover_density" android:title="@string/gs_groundcover_density_title" android:summary="@string/gs_groundcover_density_summary" android:dependency="gs_groundcover_enabled" />
         <Preference android:key="gs_groundcover_rendering_distance" android:title="@string/gs_groundcover_rendering_distance_title" android:summary="@string/gs_groundcover_rendering_distance_summary" android:dependency="gs_groundcover_enabled" />

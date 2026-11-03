@@ -1,3 +1,7 @@
+# OpenMW Android Performance
+
+Updated Android port with software scene occlusion culling and temporal shadow reuse. Existing mobile graphics, shader presets, controls, and paging are preserved. See [performance build details](PERFORMANCE-BUILD.md) for controls, source provenance, and Release build instructions.
+
 <div align="center">
 
 <img width="1541" height="333" alt="image" src="https://github.com/user-attachments/assets/15a5cc0d-9210-4ce6-b8a2-09304a1b72c9" />

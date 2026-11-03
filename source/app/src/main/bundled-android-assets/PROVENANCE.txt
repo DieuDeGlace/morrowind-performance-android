@@ -1,0 +1,5 @@
+The five android_omwfx shader assets are preserved from Andiweli/OpenMW-Android
+release 0.51.0-14, OpenMW.0.51-14.apk (SHA-256
+db78a8b6076acb0cd3db59705539490292dc5c7a098cd76f7c9af1f773145540).
+They were omitted from that source repository by its assets ignore rule.
+Original shader author credits are retained inside the files.
