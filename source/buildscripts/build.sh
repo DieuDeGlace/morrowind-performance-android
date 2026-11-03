@@ -8,6 +8,7 @@ export ARCH="arm"
 export CCACHE="false"
 ASAN="false"
 DEPLOY_RESOURCES="true"
+DEPS_ONLY="false"
 LTO="false"
 BUILD_TYPE="release"
 JOBS=""
@@ -64,6 +65,10 @@ while [[ $# -gt 0 ]]; do
 			;;
 		--release)
 			BUILD_TYPE="release"
+			shift
+			;;
+		--deps-only)
+			DEPS_ONLY="true"
 			shift
 			;;
 		--no-resources)
@@ -182,6 +187,11 @@ cmake ../.. \
 	-DBOOST_ADDRESS_MODEL=$BOOST_ADDRESS_MODEL \
 	-DLUAJIT_HOST_CC="$LUAJIT_HOST_CC" \
 	-DFFMPEG_CPU=$FFMPEG_CPU
+if [[ "$DEPS_ONLY" == "true" ]]; then
+    make -j$NCPU boost openal osg mygui ffmpeg sdl2 bullet lz4 luajit libicu
+    echo "==> Native dependencies ready"
+    exit 0
+fi
 make -j$NCPU openmw
 
 popd
