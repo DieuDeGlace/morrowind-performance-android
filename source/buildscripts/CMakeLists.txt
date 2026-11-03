@@ -246,6 +246,7 @@ BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND ${wrapper_command} <SOURCE_DIR>/bootstrap.sh
         --prefix=${prefix}
         COMMAND ${wrapper_command} bash ${CMAKE_SOURCE_DIR}/include/configure-boost-android.sh <SOURCE_DIR>
+        COMMAND ${wrapper_command} llvm-ar --version
 
         BUILD_COMMAND ""
 
@@ -273,6 +274,7 @@ BUILD_IN_SOURCE 1
         COMMAND llvm-ranlib ${prefix}/lib/libboost_program_options.a
         COMMAND llvm-ranlib ${prefix}/lib/libboost_system.a
         COMMAND llvm-ranlib ${prefix}/lib/libboost_iostreams.a
+        COMMAND llvm-ranlib ${prefix}/lib/libboost_atomic.a
 )
 
 ExternalProject_Add(ffmpeg

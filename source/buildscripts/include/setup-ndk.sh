@@ -123,6 +123,11 @@ for legacy_name in "${!BINUTILS[@]}"; do
     if [[ -x "$PREBUILT_ABS/bin/$llvm_name" ]]; then
         ln -sfn "$PREBUILT_ABS/bin/$llvm_name" "$ARCH_BIN/$NDK_TRIPLET-$legacy_name"
         ln -sfn "$PREBUILT_ABS/bin/$llvm_name" "$ARCH_BIN/$llvm_name"
+        # Legacy archive rules can invoke plain ar/ranlib. Keep LLVM bitcode
+        # indexing on the same NDK version as the Android compiler.
+        if [[ "$legacy_name" == "ar" || "$legacy_name" == "ranlib" ]]; then
+            ln -sfn "$PREBUILT_ABS/bin/$llvm_name" "$ARCH_BIN/$legacy_name"
+        fi
     fi
 done
 
@@ -130,6 +135,11 @@ done
 for llvm_name in ld.lld lld llvm-addr2line llvm-cxxfilt; do
     if [[ -x "$PREBUILT_ABS/bin/$llvm_name" ]]; then
         ln -sfn "$PREBUILT_ABS/bin/$llvm_name" "$ARCH_BIN/$llvm_name"
+        # Legacy archive rules can invoke plain ar/ranlib. Keep LLVM bitcode
+        # indexing on the same NDK version as the Android compiler.
+        if [[ "$legacy_name" == "ar" || "$legacy_name" == "ranlib" ]]; then
+            ln -sfn "$PREBUILT_ABS/bin/$llvm_name" "$ARCH_BIN/$legacy_name"
+        fi
     fi
 done
 
