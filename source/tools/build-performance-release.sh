@@ -6,38 +6,47 @@ cd "$project_root"
 jobs="${1:-4}"
 [[ "$jobs" =~ ^[1-9][0-9]*$ ]] || { echo 'Invalid job count' >&2; exit 2; }
 
-chmod +x gradlew buildscripts/build.sh buildscripts/include/*.sh
-(
-    cd buildscripts
-    ./build.sh --arch arm64 --release --lto --jobs "$jobs"
-) 2>&1 | tee buildscripts/performance-native-build.log
-
+phase="${2:-all}"
+case "$phase" in all|build|sign) ;; *) echo 'Invalid build phase' >&2; exit 2 ;; esac
 native_library="app/src/main/jniLibs/arm64-v8a/libopenmw.so"
-test -s "$native_library"
-sha256sum "$native_library" > buildscripts/openmw-051-patch39-libopenmw.sha256
-cp -R app/src/main/bundled-android-assets/android_omwfx app/src/main/assets/
-cp buildscripts/performance-engine.json app/src/main/assets/libopenmw/openmw/performance-engine.json
-
-# Include the preserved culling implementation's distribution notices.
-engine_source="buildscripts/build/arm64/openmw-prefix/src/openmw"
-{
-    printf '\n\nIntel Masked Occlusion Culling\n'
-    cat "$engine_source/extern/maskedoc/license.txt"
-    printf '\n\nsse2neon (license text in the source header)\n'
-    sed -n '1,75p' "$engine_source/extern/maskedoc/sse2neon.h"
-} >> app/src/main/assets/libopenmw/3rdparty-licenses.txt
-
 sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 test -n "$sdk_root"
 build_tools="$sdk_root/build-tools/35.0.0"
-readelf="buildscripts/toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
-"$readelf" -h "$native_library" | grep -q 'AArch64'
-if "$readelf" -S "$native_library" | grep -Eq '\.debug_(info|line|str|abbrev)'; then
-    echo 'Packaged native library still contains debug sections' >&2
-    exit 3
-fi
 
-./gradlew --no-daemon testMainlineReleaseUnitTest assembleMainlineRelease
+if [[ "$phase" != "sign" ]]; then
+    chmod +x gradlew buildscripts/build.sh buildscripts/include/*.sh
+    (
+        cd buildscripts
+        ./build.sh --arch arm64 --release --lto --jobs "$jobs"
+    ) 2>&1 | tee buildscripts/performance-native-build.log
+    
+    test -s "$native_library"
+    sha256sum "$native_library" > buildscripts/openmw-051-patch39-libopenmw.sha256
+    cp -R app/src/main/bundled-android-assets/android_omwfx app/src/main/assets/
+    cp buildscripts/performance-engine.json app/src/main/assets/libopenmw/openmw/performance-engine.json
+    
+    # Include the preserved culling implementation's distribution notices.
+    engine_source="buildscripts/build/arm64/openmw-prefix/src/openmw"
+    {
+        printf '\n\nIntel Masked Occlusion Culling\n'
+        cat "$engine_source/extern/maskedoc/license.txt"
+        printf '\n\nsse2neon (license text in the source header)\n'
+        sed -n '1,75p' "$engine_source/extern/maskedoc/sse2neon.h"
+    } >> app/src/main/assets/libopenmw/3rdparty-licenses.txt
+    
+    readelf="buildscripts/toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
+    "$readelf" -h "$native_library" | grep -q 'AArch64'
+    if "$readelf" -S "$native_library" | grep -Eq '\.debug_(info|line|str|abbrev)'; then
+        echo 'Packaged native library still contains debug sections' >&2
+        exit 3
+    fi
+    
+    ./gradlew --no-daemon testMainlineReleaseUnitTest assembleMainlineRelease
+fi
+if [[ "$phase" == "build" ]]; then
+    echo 'Unsigned ARM64 Release APK built and verified.'
+    exit 0
+fi
 
 : "${ANDROID_RELEASE_KEYSTORE:?Release signing key path is required}"
 : "${ANDROID_KEYSTORE_PASSWORD:?Release signing password is required}"
