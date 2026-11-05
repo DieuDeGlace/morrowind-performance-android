@@ -49,8 +49,8 @@
     <string name="gs_actor_shadows_summary">Allow NPCs and creatures to cast shadows.</string>
     <string name="gs_object_shadows_title">Object Shadows</string>
     <string name="gs_object_shadows_summary">Allow world objects to cast shadows.</string>
-    <string name="gs_terrain_shadows_title">Terrain Shadows</string>
-    <string name="gs_terrain_shadows_summary">Allow terrain to cast shadows.</string>
+    <string name="gs_terrain_shadows_title">Terrain casts shadows</string>
+    <string name="gs_terrain_shadows_summary">Lets hills and slopes cast shadows. With this off, buildings and actors can still cast shadows onto the ground.</string>
     <string name="gs_indoor_shadows_title">Indoor Shadows</string>
     <string name="gs_indoor_shadows_summary">Allow shadows indoors. Due to Morrowind data limitations, only actors can cast indoor shadows.</string>
     <string name="l10n_gs_shadows_quality_distance_title">Quality &amp; Distance</string>

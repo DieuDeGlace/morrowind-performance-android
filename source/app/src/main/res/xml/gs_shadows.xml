@@ -7,7 +7,7 @@
         <CheckBoxPreference android:key="gs_player_shadows" android:title="@string/gs_player_shadows_title" android:defaultValue="true" android:dependency="gs_enable_shadows" android:summary="@string/gs_player_shadows_summary" />
         <CheckBoxPreference android:key="gs_actor_shadows" android:title="@string/gs_actor_shadows_title" android:defaultValue="true" android:dependency="gs_enable_shadows" android:summary="@string/gs_actor_shadows_summary" />
         <CheckBoxPreference android:key="gs_object_shadows" android:title="@string/gs_object_shadows_title" android:defaultValue="true" android:dependency="gs_enable_shadows" android:summary="@string/gs_object_shadows_summary" />
-        <CheckBoxPreference android:key="gs_terrain_shadows" android:title="@string/gs_terrain_shadows_title" android:defaultValue="true" android:dependency="gs_enable_shadows" android:summary="@string/gs_terrain_shadows_summary" />
+        <CheckBoxPreference android:key="gs_terrain_cast_shadows" android:title="@string/gs_terrain_shadows_title" android:defaultValue="false" android:dependency="gs_enable_shadows" android:summary="@string/gs_terrain_shadows_summary" />
         <CheckBoxPreference android:key="gs_indoor_shadows" android:title="@string/gs_indoor_shadows_title" android:defaultValue="true" android:dependency="gs_enable_shadows" android:summary="@string/gs_indoor_shadows_summary" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/l10n_gs_shadows_quality_distance_title">
