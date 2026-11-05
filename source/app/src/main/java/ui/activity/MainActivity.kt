@@ -1653,9 +1653,6 @@ class MainActivity : AppCompatActivity() {
         // PCF receiver kernel instead: Low=4 taps, Medium=9 taps, High=16 taps, Very High=16 cubic-weighted taps.
         val shadowMapCount = "1"
         val shadowMapResolution = qualityProfile.shadowMapResolution
-        // The old preference defaulted to true and could persist that value on
-        // upgrade. Use a fresh opt-in for terrain casting on affected devices.
-        val terrainCastsShadows = prefs.getBoolean("gs_terrain_cast_shadows", false)
 
         val maximumShadowDistance = when (prefs.getString("gs_shadow_distance", "medium")) {
             "low" -> "2048"
@@ -1674,7 +1671,7 @@ class MainActivity : AppCompatActivity() {
                 "player shadows" to if (prefs.getBoolean("gs_player_shadows", true)) "true" else "false",
                 "actor shadows" to if (prefs.getBoolean("gs_actor_shadows", true)) "true" else "false",
                 "object shadows" to if (prefs.getBoolean("gs_object_shadows", true)) "true" else "false",
-                "terrain shadows" to terrainCastsShadows.toString(),
+                "terrain shadows" to if (prefs.getBoolean("gs_terrain_shadows", true)) "true" else "false",
                 "enable indoor shadows" to if (prefs.getBoolean("gs_indoor_shadows", true)) "true" else "false",
                 "number of shadow maps" to shadowMapCount,
                 "shadow map resolution" to shadowMapResolution,
@@ -1698,7 +1695,7 @@ class MainActivity : AppCompatActivity() {
             "Applied OpenMW 0.51 Android shadows: enabled=${prefs.getBoolean("gs_enable_shadows", false)}, " +
                 "quality=${qualityProfile.preferenceValue} (${shadowMapCount}x${shadowMapResolution}, " +
                 "pcf=${qualityProfile.pcfSamples} taps), distance=$maximumShadowDistance, fadeStart=0.75, " +
-                "normalOffset=${qualityProfile.normalOffsetDistance}, terrainCastsShadows=$terrainCastsShadows"
+                "normalOffset=${qualityProfile.normalOffsetDistance}"
         )
     }
 

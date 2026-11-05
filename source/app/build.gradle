@@ -8,8 +8,8 @@ apply plugin: 'kotlin-android'
  * calibrated OMWFX chain together behind one build-time verification gate.
  */
 
-def openMwVersionCode = 5120
-def openMwAndroidVersionName = '0.51.0-20-performance'
+def openMwVersionCode = 5121
+def openMwAndroidVersionName = '0.51.0-21-performance'
 def versionFile = new File(
         project.rootDir,
         'app/src/main/assets/libopenmw/resources/version'
@@ -164,9 +164,9 @@ tasks.register('verifyOpenMwPayload') {
             )
         }
 
-        if (openMwVersionCode != 5120 || calculateVersion() != '0.51.0-20-performance') {
+        if (openMwVersionCode != 5121 || calculateVersion() != '0.51.0-21-performance') {
             throw new GradleException(
-                    'OpenMW Android final release identity must be versionName 0.51.0-20-performance and versionCode 5120.'
+                    'OpenMW Android final release identity must be versionName 0.51.0-21-performance and versionCode 5121.'
             )
         }
 
@@ -556,7 +556,7 @@ tasks.register('verifyOpenMwPayload') {
                 !shadowFragmentShader.contains('OPENMW_ANDROID_051_GLES2_QUALITY_PCF') ||
                 !shadowFragmentShader.contains('#define OPENMW_ANDROID_SHADOW_PCF_LEVEL 2') ||
                 !shadowFragmentShader.contains('#define OPENMW_ANDROID_SHADOW_MAP_RESOLUTION 4096.0') ||
-                !shadowFragmentShader.contains('uniform sampler2D shadowTexture@shadow_texture_unit_index;') ||
+                !shadowFragmentShader.contains('uniform highp sampler2D shadowTexture@shadow_texture_unit_index;') ||
                 !shadowFragmentShader.contains('OPENMW_ANDROID_051_GLES2_RECEIVER_DEPTH_BIAS') ||
                 !shadowFragmentShader.contains('float receiverDepth = max(shadowXYZ.z - 0.00005, 0.0);') ||
                 // OPENMW_ANDROID_051_GRAZING_SHADOW_FIX_V3_BUILD_GATE

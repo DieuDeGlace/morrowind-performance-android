@@ -27,7 +27,12 @@
     uniform float maximumShadowMapDistance;
     uniform float shadowFadeStart;
     @foreach shadow_texture_unit_index @shadow_texture_unit_list
+        // A lowp sampler can quantize depth before the PCF comparison.
+#if defined(GL_ES) && defined(GL_FRAGMENT_PRECISION_HIGH)
+        uniform highp sampler2D shadowTexture@shadow_texture_unit_index;
+#else
         uniform sampler2D shadowTexture@shadow_texture_unit_index;
+#endif
         varying vec4 shadowSpaceCoords@shadow_texture_unit_index;
         // OPENMW_ANDROID_051_GRAZING_SHADOW_FIX_V1
         varying vec2 shadowReceiverPlaneSlope@shadow_texture_unit_index;
