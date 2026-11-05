@@ -1,3 +1,5 @@
+// Original (0), Soft (2), Softer (3); specialized by the launcher.
+#define OPENMW_ANDROID_SHADOW_SOFTNESS 0
 #define SHADOWS @shadows_enabled
 
 // Terrain-only receiver coverage; specialized by the Android launcher.
@@ -165,6 +167,43 @@ float unshadowedLightRatio(float distance)
                         min(terrainFootprint * OPENMW_ANDROID_TERRAIN_SHADOW_COVERAGE, 0.0030));
 #endif
                     receiverDepth = max(receiverDepth - receiverSlopeBias, 0.0);
+#if OPENMW_ANDROID_SHADOW_SOFTNESS > 0
+                    // OPENMW_ANDROID_SHADOW_SOFTNESS_CUBIC_V1
+                    // Continuous cubic reconstruction on a wider lattice.
+                    // Integer strides keep every depth read at an actual texel
+                    // centre, including per-tap receiver-plane reconstruction.
+                    // 16 reads regardless of stride; normalized to full coverage.
+                    float softnessStride = float(OPENMW_ANDROID_SHADOW_SOFTNESS);
+                    vec2 grid = clamp((shadowXYZ.xy * OPENMW_ANDROID_SHADOW_MAP_RESOLUTION - vec2(0.5)) / softnessStride,
+                        vec2(1.0), vec2((OPENMW_ANDROID_SHADOW_MAP_RESOLUTION - 1.0) / softnessStride - 2.0));
+                    vec2 cell = floor(grid);
+                    vec2 f = grid - cell;
+                    vec2 g = vec2(1.0) - f;
+                    vec2 w0 = g * g * g * 1.5;
+                    vec2 w1 = (3.0 * f * f * f - 6.0 * f * f + vec2(4.0)) * 1.5;
+                    vec2 w2 = (-3.0 * f * f * f + 3.0 * f * f + 3.0 * f + vec2(1.0)) * 1.5;
+                    vec2 w3 = f * f * f * 1.5;
+                    vec2 shadowUv = (cell * softnessStride + vec2(0.5)) * shadowTexel;
+                    vec2 anchorOffset = (shadowUv - shadowXYZ.xy) / shadowTexel;
+                    float pcfShadow = 0.0;
+                    pcfShadow += w0.x * w0.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(-1.0, -1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(-1.0, -1.0)).r);
+                    pcfShadow += w1.x * w0.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(0.0, -1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(0.0, -1.0)).r);
+                    pcfShadow += w2.x * w0.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(1.0, -1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(1.0, -1.0)).r);
+                    pcfShadow += w3.x * w0.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(2.0, -1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(2.0, -1.0)).r);
+                    pcfShadow += w0.x * w1.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(-1.0, 0.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(-1.0, 0.0)).r);
+                    pcfShadow += w1.x * w1.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(0.0, 0.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(0.0, 0.0)).r);
+                    pcfShadow += w2.x * w1.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(1.0, 0.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(1.0, 0.0)).r);
+                    pcfShadow += w3.x * w1.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(2.0, 0.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(2.0, 0.0)).r);
+                    pcfShadow += w0.x * w2.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(-1.0, 1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(-1.0, 1.0)).r);
+                    pcfShadow += w1.x * w2.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(0.0, 1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(0.0, 1.0)).r);
+                    pcfShadow += w2.x * w2.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(1.0, 1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(1.0, 1.0)).r);
+                    pcfShadow += w3.x * w2.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(2.0, 1.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(2.0, 1.0)).r);
+                    pcfShadow += w0.x * w3.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(-1.0, 2.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(-1.0, 2.0)).r);
+                    pcfShadow += w1.x * w3.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(0.0, 2.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(0.0, 2.0)).r);
+                    pcfShadow += w2.x * w3.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(1.0, 2.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(1.0, 2.0)).r);
+                    pcfShadow += w3.x * w3.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + softnessStride * vec2(2.0, 2.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * softnessStride * vec2(2.0, 2.0)).r);
+                    shadowing = min(pcfShadow * (1.0 / 81.0), shadowing);
+#else
 #if OPENMW_ANDROID_SHADOW_PCF_LEVEL == 0
                     // OPENMW_ANDROID_051_GRAZING_SHADOW_FIX_V3
                     vec2 shadowUv = (floor(shadowXYZ.xy * OPENMW_ANDROID_SHADOW_MAP_RESOLUTION) + vec2(0.5)) * shadowTexel;
@@ -291,7 +330,8 @@ float unshadowedLightRatio(float distance)
                     pcfShadow += w2.x * w3.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + vec2(1.0, 2.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * vec2(1.0, 2.0)).r);
                     pcfShadow += w3.x * w3.y * step(openmwAndroidConservativeReceiverDepthV6(receiverDepth, receiverPlaneSlope, geometricReceiverPlaneSlope, shadowTexel, anchorOffset + vec2(2.0, 2.0)), texture2D(shadowTexture@shadow_texture_unit_index, shadowUv + shadowTexel * vec2(2.0, 2.0)).r);
                     shadowing = min(pcfShadow * (1.0 / 81.0), shadowing);
-#endif
+#endif // original quality filter
+#endif // shadow softness
                 }
 
                 doneShadows = all(lessThan(shadowXYZ, vec3(0.95, 0.95, 1.0))) && all(greaterThan(shadowXYZ, vec3(0.05, 0.05, 0.0)));

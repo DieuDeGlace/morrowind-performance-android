@@ -45,3 +45,17 @@ occlusion culling and temporal shadow reuse are retained. The native library
 and engine source pin are unchanged. This is a shader/launcher update; actual
 phone validation is still required. Original core shaders are refreshed by the
 launcher each start; OMWFX shader changes alone do not replace this receiver.
+
+
+## Release 19: selectable shadow softness
+
+In the launcher open Advanced settings → Shadows → Shadow softness, choose
+Original, Soft or Softer, and restart the game. Original preserves release 18
+exactly. Soft/Softer use a continuous cubic 16-tap filter with two-/three-texel
+spacing, independent of quality/map resolution. This costs more samples on
+Low/Medium and preserves the High/Very High sample count. Wider filtering may
+reduce small contact shadows. The terrain correction and Rafael compatibility
+are retained. The native engine, culling and external mod/config support are
+unchanged. Desktop GPU fixtures cover edge widths, exact original output,
+ES100 compilation/rendering, and grazing terrain; Android device playtesting
+remains necessary for device-specific driver behavior.

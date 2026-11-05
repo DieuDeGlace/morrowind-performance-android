@@ -1633,6 +1633,8 @@ class MainActivity : AppCompatActivity() {
             )
             .let { graphics.TerrainShadowCorrection.specialize(it,
                 prefs.getString("gs_terrain_shadow_correction", "standard")) }
+            .let { graphics.ShadowSoftness.specialize(it,
+                prefs.getString("gs_shadow_softness", "original")) }
     }
 
     /**

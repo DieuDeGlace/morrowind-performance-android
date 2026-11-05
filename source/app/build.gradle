@@ -8,8 +8,8 @@ apply plugin: 'kotlin-android'
  * calibrated OMWFX chain together behind one build-time verification gate.
  */
 
-def openMwVersionCode = 5118
-def openMwAndroidVersionName = '0.51.0-18-performance'
+def openMwVersionCode = 5119
+def openMwAndroidVersionName = '0.51.0-19-performance'
 def versionFile = new File(
         project.rootDir,
         'app/src/main/assets/libopenmw/resources/version'
@@ -164,9 +164,9 @@ tasks.register('verifyOpenMwPayload') {
             )
         }
 
-        if (openMwVersionCode != 5118 || calculateVersion() != '0.51.0-18-performance') {
+        if (openMwVersionCode != 5119 || calculateVersion() != '0.51.0-19-performance') {
             throw new GradleException(
-                    'OpenMW Android final release identity must be versionName 0.51.0-18-performance and versionCode 5118.'
+                    'OpenMW Android final release identity must be versionName 0.51.0-19-performance and versionCode 5119.'
             )
         }
 
@@ -471,6 +471,12 @@ tasks.register('verifyOpenMwPayload') {
             throw new GradleException(
                     'OpenMW 0.51 Android requires the GLES2-safe weather WetWorld/puddle shader.'
             )
+        }
+
+        def softnessShader = file('src/main/assets/libopenmw/resources/shaders/compatibility/shadows_fragment.glsl').getText('UTF-8')
+        if (!softnessShader.contains('#define OPENMW_ANDROID_SHADOW_SOFTNESS 0') ||
+                !softnessShader.contains('OPENMW_ANDROID_SHADOW_SOFTNESS_CUBIC_V1')) {
+            throw new GradleException('Android shadow softness payload is missing or mismatched.')
         }
 
         def terrainCorrection = file('src/main/assets/libopenmw/resources/shaders/compatibility/terrain.frag').getText('UTF-8')

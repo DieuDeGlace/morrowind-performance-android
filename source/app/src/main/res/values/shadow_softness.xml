@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shadow_softness_title">Shadow softness</string>
+    <string name="shadow_softness_dialog">Shadow softness (restart game to apply). Soft and Softer use 16 samples, which can cost more on Low or Medium quality. Wider edges can reduce small contact shadows.</string>
+    <string-array name="shadow_softness_entries">
+        <item>Original (quality preset)</item><item>Soft</item><item>Softer</item>
+    </string-array>
+    <string-array name="shadow_softness_values">
+        <item>original</item><item>soft</item><item>softer</item>
+    </string-array>
+</resources>

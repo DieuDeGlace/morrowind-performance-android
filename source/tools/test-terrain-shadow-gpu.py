@@ -104,4 +104,22 @@ class ShadowTests(unittest.TestCase):
             data=render(NEW,level,es=True,blocker=True)
             self.assertTrue(np.isfinite(data).all())
 
+    def test_soft_and_softer_keep_terrain_correction_and_cast_shadows(self):
+        for stride in (2,3):
+            source=NEW.replace('#define OPENMW_ANDROID_SHADOW_SOFTNESS 0',
+                f'#define OPENMW_ANDROID_SHADOW_SOFTNESS {stride}')
+            for level in range(1,5):
+                self.assertGreater(float(render(source,level).mean()),.999)
+                data=render(source,level,blocker=True)
+                self.assertGreater(float(data[:,:35].mean()),.999)
+                self.assertLess(float(data[:,93:].mean()),.001)
+
+    def test_es100_all_softness_levels_compile_and_render(self):
+        for stride in (0,2,3):
+            source=NEW.replace('#define OPENMW_ANDROID_SHADOW_SOFTNESS 0',
+                f'#define OPENMW_ANDROID_SHADOW_SOFTNESS {stride}')
+            for level in range(5):
+                data=render(source,level,es=True,blocker=True)
+                self.assertTrue(np.isfinite(data).all())
+
 if __name__=='__main__':unittest.main(verbosity=2)
