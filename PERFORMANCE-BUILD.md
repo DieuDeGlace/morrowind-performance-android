@@ -30,3 +30,18 @@ The default editable configuration is `Documents/OpenMW-Performance/config` in s
 On Android 11+, **Shared storage access** opens Android's All files access page when needed. Grant access and return to the launcher; root is not required. This uses Android's [documented direct file access](https://developer.android.com/training/data-storage/manage-all-files). Use ordinary shared folders such as Documents or an SD-card folder rather than another app's Android/data directory.
 
 Close the game before editing the shared files. The selected user `openmw.cfg` is loaded after the generated launcher config. The old app-private user-config location is excluded to prevent loading the copied options twice. Launcher-managed controls such as shadows, occlusion culling and resolution still apply at launch; other manual settings, including `[Camera] viewing distance`, remain in the shared `settings.cfg`.
+
+
+## Android 18: terrain shadow stripes
+
+The user confirmed that disabling Terrain Shadows removes the ground bands.
+Release 18 adds a terrain-only geometric PCF comparison and bounded coverage
+correction, with a Shadows → Terrain shadow correction selector. Start with
+Standard; use Stronger if some self-shadow stripes remain. Legacy restores the
+previous receiver result. Keep Terrain Shadows enabled to test the fix.
+
+Shared configuration and mod folders, the duplicate user-data fix, mobile PCF,
+occlusion culling and temporal shadow reuse are retained. The native library
+and engine source pin are unchanged. This is a shader/launcher update; actual
+phone validation is still required. Original core shaders are refreshed by the
+launcher each start; OMWFX shader changes alone do not replace this receiver.

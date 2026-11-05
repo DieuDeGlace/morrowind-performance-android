@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terrain_shadow_correction_title">Terrain shadow correction</string>
+    <string-array name="terrain_shadow_correction_entries">
+        <item>Standard (reduce terrain stripes)</item>
+        <item>Stronger (more surface separation)</item>
+        <item>Legacy</item>
+    </string-array>
+    <string-array name="terrain_shadow_correction_values">
+        <item>standard</item><item>strong</item><item>legacy</item>
+    </string-array>
+</resources>

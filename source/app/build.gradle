@@ -8,8 +8,8 @@ apply plugin: 'kotlin-android'
  * calibrated OMWFX chain together behind one build-time verification gate.
  */
 
-def openMwVersionCode = 5117
-def openMwAndroidVersionName = '0.51.0-17-performance'
+def openMwVersionCode = 5118
+def openMwAndroidVersionName = '0.51.0-18-performance'
 def versionFile = new File(
         project.rootDir,
         'app/src/main/assets/libopenmw/resources/version'
@@ -164,9 +164,9 @@ tasks.register('verifyOpenMwPayload') {
             )
         }
 
-        if (openMwVersionCode != 5117 || calculateVersion() != '0.51.0-17-performance') {
+        if (openMwVersionCode != 5118 || calculateVersion() != '0.51.0-18-performance') {
             throw new GradleException(
-                    'OpenMW Android final release identity must be versionName 0.51.0-17-performance and versionCode 5117.'
+                    'OpenMW Android final release identity must be versionName 0.51.0-18-performance and versionCode 5118.'
             )
         }
 
@@ -471,6 +471,14 @@ tasks.register('verifyOpenMwPayload') {
             throw new GradleException(
                     'OpenMW 0.51 Android requires the GLES2-safe weather WetWorld/puddle shader.'
             )
+        }
+
+        def terrainCorrection = file('src/main/assets/libopenmw/resources/shaders/compatibility/terrain.frag').getText('UTF-8')
+        def terrainReceiver = file('src/main/assets/libopenmw/resources/shaders/compatibility/shadows_fragment.glsl').getText('UTF-8')
+        if (!terrainCorrection.contains('#define OPENMW_ANDROID_TERRAIN_SHADOW_RECEIVER') ||
+                !terrainReceiver.contains('OPENMW_ANDROID_TERRAIN_SHADOW_GEOMETRIC_PLANE_V1') ||
+                !terrainReceiver.contains('#define OPENMW_ANDROID_TERRAIN_SHADOW_COVERAGE 0.55')) {
+            throw new GradleException('Android terrain shadow correction payload is missing or mismatched.')
         }
 
         def finalWaterVertex = file('src/main/assets/libopenmw/resources/shaders/compatibility/water.vert')

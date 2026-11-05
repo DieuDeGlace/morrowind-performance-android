@@ -1419,6 +1419,11 @@ class MainActivity : AppCompatActivity() {
             throw IOException("Runtime OpenMW 0.51 grazing-angle shadow vertex/fragment pair is mismatched")
         }
 
+        if (!terrainFragmentText.contains("#define OPENMW_ANDROID_TERRAIN_SHADOW_RECEIVER") ||
+            !shadowReceiverText.contains("OPENMW_ANDROID_TERRAIN_SHADOW_GEOMETRIC_PLANE_V1")) {
+            throw IOException("Terrain shadow correction shader pair is missing or mismatched")
+        }
+
         val shadowQualityProfile = selectedAndroidShadowQualityProfile()
         if (shadowQualityProfile.pcfLevel == 4 &&
             (!shadowReceiverText.contains("OPENMW_ANDROID_051_CUBIC_PCF_16_V3") ||
@@ -1626,6 +1631,8 @@ class MainActivity : AppCompatActivity() {
                 resolutionPattern,
                 "#define OPENMW_ANDROID_SHADOW_MAP_RESOLUTION ${profile.shadowMapResolution}.0"
             )
+            .let { graphics.TerrainShadowCorrection.specialize(it,
+                prefs.getString("gs_terrain_shadow_correction", "standard")) }
     }
 
     /**
