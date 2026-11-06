@@ -53,7 +53,7 @@ object Constants {
     // e.g. /data/user/0/com.ast.openmw/files/config
     var GLOBAL_CONFIG = ""
 
-    // Active user configuration directory, normally Documents/OpenMW-Performance/config.
+    // Active user configuration directory, normally Documents/OpenMW-Physics-Test/config.
     // The app-owned config directory remains the fallback until shared storage is available.
     var USER_CONFIG = ""
 

@@ -169,6 +169,7 @@ class MyApp : Application() {
 
     /** Cheap check (a few stat calls) whether the legacy tree still has to be moved. */
     private fun legacyUserStorageMigrationNeeded(): Boolean {
+        if (com.libopenmw.openmw.BuildConfig.IS_RAGDOLL_PREVIEW) return false
         if (legacyMigrationAttemptFailed)
             return false
 

@@ -55,7 +55,7 @@ fi
 : "${ANDROID_KEY_ALIAS:=openmw-performance}"
 release_root="$project_root/../release"
 mkdir -p "$release_root"
-apk_name='OpenMW-Android-0.51.0-21-performance-arm64.apk'
+apk_name='OpenMW-Android-0.51.0-ragdoll-preview-arm64.apk'
 unsigned='app/build/outputs/apk/mainline/release/app-mainline-release-unsigned.apk'
 test -s "$unsigned"
 "$build_tools/zipalign" -p -f 4 "$unsigned" "$release_root/aligned.apk"
@@ -67,7 +67,7 @@ test -s "$unsigned"
 rm "$release_root/aligned.apk"
 "$build_tools/aapt" dump badging "$release_root/$apk_name" | sed -n '1p' \
     > "$release_root/APK-INFO.txt"
-grep -Fq "package: name='com.dieudeglace.openmw.performance'" "$release_root/APK-INFO.txt"
+grep -Fq "package: name='com.dieudeglace.openmw.ragdolltest'" "$release_root/APK-INFO.txt"
 python3 - "$native_library" "$release_root/$apk_name" <<'PY'
 from pathlib import Path
 from zipfile import ZipFile

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="performance_app_name">OpenMW Performance</string>
+    <string name="performance_app_name">OpenMW Physics Test</string>
     <string name="performance_occlusion_title">Software occlusion culling</string>
     <string name="performance_occlusion_summary">Skip hidden world geometry to reduce rendering work. Experimental; restart the game after changing.</string>
     <string name="performance_shadow_interval_title">Shadow update interval</string>

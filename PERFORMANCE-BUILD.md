@@ -1,3 +1,21 @@
+# Android ragdoll test
+
+This branch ports the desktop physics-test feature to the existing Android
+OpenMW 0.51 performance engine. The preview uses the Android app ID
+com.dieudeglace.openmw.ragdolltest and its own Documents/OpenMW-Physics-Test
+configuration folder. It reads the Morrowind installation selected in its
+launcher.
+
+Aim at a supported corpse and tap Activate to loot. Hold the on-screen
+Activate button for about a third of a second to grab the aimed body part.
+Walk or look around while holding, then let go to drop the body. Hardware
+Activate bindings use the same gesture. Melee attacks also push the struck
+part. Corpses with unmapped skeletons use the original death animation.
+
+The Android solver sleeps idle rigs and caps awake rigs at six. Its culling,
+mobile shadows, and optimized native build follow the Android performance
+baseline.
+
 # OpenMW Performance for Android
 
 This update starts from the current Andiweli/OpenMW-Android port and its supported OpenMW 0.51.0 Final engine. It adds Intel Masked Occlusion Culling for terrain, static objects and object paging, plus temporal shadow reuse. The desktop companion follows OpenMW 0.53 development; the Android build retains the port's current 0.51-specific Surface, GL4ES, shadows, input, OMWFX and graphics fixes.

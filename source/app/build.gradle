@@ -775,10 +775,11 @@ android {
         // Both flavors intentionally use the same installed package name. Google Play
         // can therefore serve the appropriate artifact per form factor while the
         // shared OpenMW user-data path remains stable.
-        applicationId "com.dieudeglace.openmw.performance"
+        applicationId "com.dieudeglace.openmw.ragdolltest"
 
         versionCode openMwVersionCode
-        versionName calculateVersion()
+        versionName calculateVersion() + "-ragdoll-preview"
+        buildConfigField "boolean", "IS_RAGDOLL_PREVIEW", "true"
 
         minSdk 21
 
@@ -810,8 +811,7 @@ android {
         }
 
         debug {
-            // Deliberately no applicationIdSuffix. Debug and release both use
-            // com.ast.openmw, so Android gives both the same app-specific data path.
+            // Debug and release share the preview app's private data path.
             debuggable true
         }
     }

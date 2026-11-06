@@ -98,7 +98,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ !inputs.dependencies_only }}
         with:
-          name: OpenMW-performance-Android-arm64
+          name: OpenMW-Ragdoll-Preview-Android-arm64
           path: release/*
           if-no-files-found: error
       - uses: actions/upload-artifact@v4

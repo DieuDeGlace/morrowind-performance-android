@@ -13,7 +13,7 @@ object SharedConfig {
 
     fun recommended(): File = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-        "OpenMW-Performance/config"
+        "OpenMW-Physics-Test/config"
     )
 
     fun ensureForLaunch(context: Context) {
@@ -31,7 +31,7 @@ object SharedConfig {
         if (!selected.isAbsolute || path == File.separator ||
             path.contains("/Android/data/") || path.endsWith("/Android/data") ||
             path.contains("/Android/obb/") || path.endsWith("/Android/obb"))
-            throw IOException("Choose a settings folder outside Android/data, such as Documents/OpenMW-Performance/config.")
+            throw IOException("Choose a settings folder outside Android/data, such as Documents/OpenMW-Physics-Test/config.")
         val game = GameInstaller.getDataFilesFile(context).canonicalFile
         if (target == game || path.startsWith(game.path + File.separator))
             throw IOException("Choose a settings folder outside the base game's Data Files.")
