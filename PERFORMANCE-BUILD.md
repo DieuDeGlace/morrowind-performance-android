@@ -109,7 +109,7 @@ save-storage change. The mod files themselves remain wherever you stored them.
 Already-deleted saves cannot be recreated by this migration.
 ## Physics preview 4: general actor and native item physics
 
-The native engine is pinned to ee6b000fa4faf41da4c8105ebba342148db0b939 and shares the Windows
+The native engine is pinned to bba6c0dc9cd40e6f12dee1daabff20c26cc622e8 and shares the Windows
 automatic actor-rig implementation. Known tuned skeletons remain preferred.
 Other NPCs and creatures generate joints from skin bones or separate animated
 mesh parts, with at most 24 generated bodies per actor. Unrigged/vertex-morphed

@@ -1,6 +1,6 @@
 {
-  "engine_commit": "ee6b000fa4faf41da4c8105ebba342148db0b939",
-  "engine_archive_sha256": "d448575786a13aeef5714f68bba26e4886e0e829af8e08838141d6e3a97e1bf4",
+  "engine_commit": "bba6c0dc9cd40e6f12dee1daabff20c26cc622e8",
+  "engine_archive_sha256": "dec7fe1c266647833406b7b2219349175a2d742c7f6e376471aa5dc2a93a6c0b",
   "upstream_engine_commit": "f4bec41444214a7903bebd178389ca22ca13f646",
   "performance_source_commit": "fefb35e4a51c98da305c2b6031af34666973d84f",
   "android_source": "Andiweli/OpenMW-Android main"
