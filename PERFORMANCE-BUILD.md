@@ -107,3 +107,19 @@ reselect the same shared folder if a later installation uses a custom location.
 App-private mod-folder registrations and load order are not exported by this
 save-storage change. The mod files themselves remain wherever you stored them.
 Already-deleted saves cannot be recreated by this migration.
+## Physics preview 4: every actor model can attempt physics
+
+The native engine is pinned to ffa7b6662bc9f67238aa2afe862bb2bded859036 and shares the Windows
+automatic actor-rig implementation. Known tuned skeletons remain preferred.
+Other NPCs and creatures generate joints from skin bones or separate animated
+mesh parts, with at most 24 generated bodies per actor. Unrigged/vertex-morphed
+models (including the vanilla kwama forager) use whole-body collision, hits and
+dragging. Independent limbs require actual usable joints. Body morphs are frozen
+during physics and their controllers return on resurrection. Empty/invalid
+models and the existing Android limits (6 awake, 32 retained rigs) can still
+use ordinary death handling. Loose-item physics is outside this change.
+
+This release keeps Preview 3's shared settings-and-saves behavior and the same
+application ID and release signing key. VersionCode is 5123. Install over the
+existing physics preview without uninstalling; the regular Performance app is
+a separate application.
