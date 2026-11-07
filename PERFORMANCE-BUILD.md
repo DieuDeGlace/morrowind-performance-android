@@ -77,3 +77,33 @@ are retained. The native engine, culling and external mod/config support are
 unchanged. Desktop GPU fixtures cover edge widths, exact original output,
 ES100 compilation/rendering, and grazing terrain; Android device playtesting
 remains necessary for device-specific driver behavior.
+
+## Physics Preview 3: shared saves by default
+
+The Android launcher now uses the selected shared configuration folder as the
+default engine user-data folder. The default is
+Documents/OpenMW-Physics-Test/config; saves go in its saves/<character>/ subfolders,
+beside openmw.cfg and settings.cfg. Screenshots made by the engine also use this
+shared user-data folder. The launcher calls this the Settings and saves folder.
+
+On the first launch for a selected folder, existing saves in this app's old
+app-specific storage and the previous configuration folder are copied there.
+Original saves remain in place. Existing shared saves are not replaced:
+identical saves are skipped, and differing same-name saves are retained under
+an imported-<content hash>.omwsave filename with their original in-game save
+description. A failed copy stops the launch without changing the selected
+configuration path. Copying can safely be retried.
+
+Explicit user-data entries in the shared openmw.cfg and explicit --user-data
+command-line arguments keep their custom behavior. The launcher supplies the
+shared-folder default when no custom override exists. It no longer silently
+launches into private save storage when Documents is unavailable; enable Shared
+storage access or choose another writable shared folder.
+
+This update keeps application ID com.dieudeglace.openmw.ragdolltest and the same
+release signing key, and increases versionCode to 5122. Install it over the current
+physics preview without uninstalling. Shared saves survive normal app removal;
+reselect the same shared folder if a later installation uses a custom location.
+App-private mod-folder registrations and load order are not exported by this
+save-storage change. The mod files themselves remain wherever you stored them.
+Already-deleted saves cannot be recreated by this migration.

@@ -8,7 +8,6 @@ import android.widget.Toast
 import com.codekidlabs.storagechooser.Content
 import com.codekidlabs.storagechooser.StorageChooser
 import com.libopenmw.openmw.R
-import constants.Constants
 import file.SharedConfig
 import permission.PermissionHelper
 import java.io.File
@@ -72,7 +71,7 @@ object StorageUi {
 
     fun refresh(fragment: PreferenceFragment) {
         val activity = fragment.activity ?: return
-        fragment.findPreference("performance_config_folder")?.summary = Constants.USER_CONFIG
+        fragment.findPreference("performance_config_folder")?.summary = SharedConfig.selectedOrRecommended(activity).path
         fragment.findPreference("performance_storage_access")?.summary = activity.getString(
             if (PermissionHelper.hasSharedStorageAccess(activity)) R.string.performance_storage_granted
             else R.string.performance_storage_access_summary

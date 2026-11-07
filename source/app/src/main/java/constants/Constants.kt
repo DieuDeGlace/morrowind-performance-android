@@ -25,12 +25,13 @@ object Constants {
     const val HIDE_CONTROLS = "pref_hide_controls"
     const val HANDHELD_MODE = "pref_handheld_mode"
 
-    // User-owned OpenMW data root.
+    // App-specific runtime data root and source for copying legacy saves.
     //
     // This is initialized from Context.getExternalFilesDir(null) by MyApp:
     //   /storage/emulated/0/Android/data/com.ast.openmw/files/OpenMW
     //
-    // It contains saves, screenshots, user config, custom control icons,
+    // New engine saves and screenshots default to the shared configuration folder.
+    // This root retains old saves, fallback config, custom control icons,
     // the writable resource mirror, navmesh.db and other engine user data.
     var USER_FILE_STORAGE = ""
 

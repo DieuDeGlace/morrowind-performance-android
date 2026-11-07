@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="performance_storage_access">Shared storage access</string>
-    <string name="performance_storage_access_summary">Allow separate mod folders and editable settings outside Android/data.</string>
-    <string name="performance_storage_access_explanation">Allow file access on the next Android screen, then return to OpenMW. This lets OpenMW read mod folders and write your settings in shared storage. Root is not required.</string>
-    <string name="performance_storage_granted">Allowed. Shared mod and configuration folders can be used.</string>
+    <string name="performance_storage_access_summary">Allow mod folders, settings and saves outside Android/data.</string>
+    <string name="performance_storage_access_explanation">Allow file access on the next Android screen, then return to OpenMW. This lets OpenMW read mod folders and keep settings and saves in shared storage. Root is not required.</string>
+    <string name="performance_storage_granted">Allowed. Shared mod, settings and save folders can be used.</string>
     <string name="performance_grant_access">Allow file access</string>
-    <string name="performance_config_folder">Settings and config folder</string>
-    <string name="performance_config_folder_explanation">Use %1$s, or choose another folder. Existing configuration is copied without deleting the originals. Files already in the selected folder are kept. The folder is read and written when the game starts.</string>
+    <string name="performance_config_folder">Settings and saves folder</string>
+    <string name="performance_config_folder_explanation">Use %1$s, or choose another folder. Saves default to its saves subfolder. Existing app saves and settings are copied without deleting originals. Conflicting saves are kept as separate files. Custom save paths are respected. Shared storage access is required.</string>
     <string name="performance_use_documents">Use Documents</string>
     <string name="performance_browse">Choose folder</string>
-    <string name="performance_copying_config">Preparing the configuration folder…</string>
-    <string name="performance_config_ready">Configuration folder: %1$s</string>
+    <string name="performance_copying_config">Preparing shared settings and saves…</string>
+    <string name="performance_config_ready">Settings and saves folder: %1$s</string>
     <string name="performance_storage_error">Folder access</string>
     <string name="performance_add_mod_folder">Add mod folder</string>
     <string name="performance_mod_folder_help">Choose the folder containing a mod’s meshes, textures or plugin files. The base Data Files folder stays untouched. Enable plugins in the Plugins tab. In Directories, drag folders into order; lower folders override earlier folders. Long-press a folder to remove it from the list.</string>
