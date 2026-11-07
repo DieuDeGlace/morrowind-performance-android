@@ -107,9 +107,9 @@ reselect the same shared folder if a later installation uses a custom location.
 App-private mod-folder registrations and load order are not exported by this
 save-storage change. The mod files themselves remain wherever you stored them.
 Already-deleted saves cannot be recreated by this migration.
-## Physics preview 4: every actor model can attempt physics
+## Physics preview 4: general actor and native item physics
 
-The native engine is pinned to fb25f89d817d7e558f4f7877663d643da24a6e8d and shares the Windows
+The native engine is pinned to ee6b000fa4faf41da4c8105ebba342148db0b939 and shares the Windows
 automatic actor-rig implementation. Known tuned skeletons remain preferred.
 Other NPCs and creatures generate joints from skin bones or separate animated
 mesh parts, with at most 24 generated bodies per actor. Unrigged/vertex-morphed
@@ -117,9 +117,35 @@ models (including the vanilla kwama forager) use whole-body collision, hits and
 dragging. Independent limbs require actual usable joints. Body morphs are frozen
 during physics and their controllers return on resurrection. Empty/invalid
 models and the existing Android limits (6 awake, 32 retained rigs) can still
-use ordinary death handling. Loose-item physics is outside this change.
+use ordinary death handling. Living actors keep their normal animation and movement.
 
 This release keeps Preview 3's shared settings-and-saves behavior and the same
 application ID and release signing key. VersionCode is 5123. Install over the
 existing physics preview without uninstalling; the regular Performance app is
 a separate application.
+
+## Native item controls and compatibility
+
+The native backend independently implements MaxYari/OpenMWLuaPhysics 1.4's
+default Potato object rules (https://github.com/MaxYari/OpenMWLuaPhysics).
+Clothing, armor, books, ingredients, miscellaneous items, potions, weapons,
+apparatus, lockpicks, probes and repair tools can be pushed, grabbed and thrown.
+Doors, containers, static scenery, activators and lights keep their ordinary
+behavior. Items wake on interaction, sleep when settled, and collide with world
+geometry and living actors. Item/item and item/corpse collisions are disabled.
+Android limits native items to 16 awake and 64 retained bodies.
+
+Tap Activate for normal pickup. Hold Activate to grab, release to drop, and use
+Attack while holding to throw. Melee pushes eligible items. Item position and
+rotation update normal world records and survive save/reload. Owned-item
+disturbance/destruction uses the engine's crime detection.
+
+Matching optional meshes/debris assets permit unscripted miscellaneous items to
+break into bounded debris. No third-party assets are bundled; without matching
+meshes, items remain intact. The full Lua API, optional Normal collision mode,
+and Impact Effects package are not implemented by the native backend.
+
+Native items yield automatically when LuaPhysicsEngine.omwscripts or its engine
+scripts are configured. Disable that manifest to use native items; its installed
+asset data folder can remain enabled for debris. Actor ragdolls remain available.
+Preview 3's shared settings and saves default is preserved.
