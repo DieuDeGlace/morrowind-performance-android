@@ -9,7 +9,7 @@ apply plugin: 'kotlin-android'
  */
 
 def openMwVersionCode = 5121
-def ragdollPreviewVersionCode = 5126
+def ragdollPreviewVersionCode = 5127
 def openMwAndroidVersionName = '0.51.0-21-performance'
 def versionFile = new File(
         project.rootDir,
@@ -476,7 +476,8 @@ tasks.register('verifyOpenMwPayload') {
 
         def softnessShader = file('src/main/assets/libopenmw/resources/shaders/compatibility/shadows_fragment.glsl').getText('UTF-8')
         if (!softnessShader.contains('#define OPENMW_ANDROID_SHADOW_SOFTNESS 0') ||
-                !softnessShader.contains('OPENMW_ANDROID_SHADOW_SOFTNESS_CUBIC_V1')) {
+                !softnessShader.contains('OPENMW_ANDROID_SHADOW_SOFTNESS_CUBIC_V1') ||
+                !softnessShader.contains('OPENMW_ANDROID_SHADOW_CONTIGUOUS_V1')) {
             throw new GradleException('Android shadow softness payload is missing or mismatched.')
         }
 
@@ -779,7 +780,7 @@ android {
         applicationId "com.dieudeglace.openmw.ragdolltest"
 
         versionCode ragdollPreviewVersionCode
-        versionName calculateVersion() + "-ragdoll-preview.7"
+        versionName calculateVersion() + "-ragdoll-preview.8"
         buildConfigField "boolean", "IS_RAGDOLL_PREVIEW", "true"
 
         minSdk 21

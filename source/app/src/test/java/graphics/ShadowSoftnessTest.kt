@@ -10,11 +10,11 @@ class ShadowSoftnessTest {
 #define OPENMW_ANDROID_SHADOW_PCF_LEVEL 2
 #define OPENMW_ANDROID_TERRAIN_SHADOW_COVERAGE 0.55
 """
-    @Test fun defaultKeepsOriginal() { assertEquals(0, ShadowSoftness.stride(null)) }
-    @Test fun unknownPreferenceKeepsOriginal() { assertEquals(0, ShadowSoftness.stride("bad")) }
-    @Test fun softUsesTwoTexelStride() { assertEquals(2, ShadowSoftness.stride("soft")) }
-    @Test fun softerUsesThreeTexelStride() { assertEquals(3, ShadowSoftness.stride("softer")) }
-    @Test fun changesOnlyFilterFootprint() {
+    @Test fun defaultKeepsOriginal() { assertEquals(0, ShadowSoftness.mode(null)) }
+    @Test fun unknownPreferenceKeepsOriginal() { assertEquals(0, ShadowSoftness.mode("bad")) }
+    @Test fun softSelectsBlendedKernel() { assertEquals(2, ShadowSoftness.mode("soft")) }
+    @Test fun softerSelectsBroadKernel() { assertEquals(3, ShadowSoftness.mode("softer")) }
+    @Test fun changesOnlySoftnessMode() {
         assertEquals(shader.replace("SOFTNESS 0", "SOFTNESS 3"), ShadowSoftness.specialize(shader,"softer"))
     }
     @Test fun originalRestoresAfterSofter() {

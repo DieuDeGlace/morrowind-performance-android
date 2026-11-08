@@ -184,3 +184,23 @@ engine. The Android launcher no longer needs to inject an enable flag. Custom
 environment settings still support OPENMW_RAGDOLLS=0 to disable the native
 physics backend and OPENMW_ITEMS=0 to disable only native objects. Application
 ID, signing key, shared settings and saves remain unchanged. VersionCode is 5125.
+
+## Physics preview 8: stable Soft and Softer sampling
+
+Soft and Softer now sample a contiguous 4x4 texel grid. The previous sparse
+two/three-texel strides could miss thin shadows on alternating frames as the
+shadow map moved. Continuous normalized weights keep two softness choices at
+the same 16 depth reads. The blur footprint is narrower than the old sparse
+filter; Original keeps its existing quality-specific kernel. Receiver bias,
+terrain correction and shadow-distance controls retain their behavior.
+
+The release workflow runs `python source/tools/test-shadow-filter-gpu.py` with
+headless Mesa before packaging. It executes the bundled GLSL under equivalent
+world-shadow translations at Medium/4K, compiles desktop/GLES shader variants,
+and checks broad cast shadows, lit areas and terrain receiver correction.
+For local runs install `moderngl==5.12.0` and `numpy==2.2.6`.
+These fixtures do not substitute for testing on an Android device.
+
+The native engine pin remains unchanged; this is a shader/launcher release.
+The APK keeps its application ID and signing key, with versionCode 5127, so
+it can update Physics Preview 7 in place. Uninstalling is unnecessary.
