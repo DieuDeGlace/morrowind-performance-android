@@ -156,6 +156,7 @@ echo "==> Build using $NCPU parallel job(s)"
 mkdir -p build/$ARCH/
 mkdir -p prefix/$ARCH/
 
+
 # Archive mtimes can predate cached objects from another pin. Reset only the
 # engine source/build prefix when its pin or compiler configuration changes.
 engine_cache_configuration="$BUILD_TYPE:$ASAN:$LTO:$CFLAGS:$CXXFLAGS:$LDFLAGS"
@@ -165,25 +166,9 @@ fi
 
 
 # symlink lib64 -> lib so we don't get half the libs in one directory half in another
-mkdir -p prefix/$ARCH/
-
-# Archive mtimes can predate cached objects from another pin. Reset only the
-# engine source/build prefix when its pin or compiler configuration changes.
-engine_cache_configuration="$BUILD_TYPE:$ASAN:$LTO:$CFLAGS:$CXXFLAGS:$LDFLAGS"
-if [[ "$DEPS_ONLY" != "true" ]]; then
-    python3 "$DIR/../tools/engine-cache.py" prepare --arch "$ARCH" --configuration "$engine_cache_configuration"
-fi
-lib
+mkdir -p prefix/$ARCH/lib
 ln -sf lib prefix/$ARCH/lib64
-mkdir -p prefix/$ARCH/
-
-# Archive mtimes can predate cached objects from another pin. Reset only the
-# engine source/build prefix when its pin or compiler configuration changes.
-engine_cache_configuration="$BUILD_TYPE:$ASAN:$LTO:$CFLAGS:$CXXFLAGS:$LDFLAGS"
-if [[ "$DEPS_ONLY" != "true" ]]; then
-    python3 "$DIR/../tools/engine-cache.py" prepare --arch "$ARCH" --configuration "$engine_cache_configuration"
-fi
-osg/lib
+mkdir -p prefix/$ARCH/osg/lib
 ln -sf lib prefix/$ARCH/osg/lib64
 
 # generate command_wrapper.sh

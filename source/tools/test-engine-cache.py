@@ -2,6 +2,8 @@
 import importlib.util
 import json
 import os
+import shutil
+import subprocess
 from pathlib import Path
 import tempfile
 import time
@@ -52,6 +54,28 @@ class EngineCacheTests(unittest.TestCase):
     def test_architecture_cannot_escape_build_root(self):
         with self.assertRaises(RuntimeError):cache.prepare(self.root,'../../outside',self.config)
         self.assertTrue(self.dependency.exists())
+    @unittest.skipIf(os.name=='nt','Android build.sh integration runs on the Linux CI host')
+    def test_build_script_reaches_cmake_with_native_dependencies_preserved(self):
+        project=self.root/'script-smoke';scripts=project/'buildscripts';tools=project/'tools';fakebin=project/'bin'
+        for directory in (scripts/'include',tools,fakebin):directory.mkdir(parents=True,exist_ok=True)
+        actual=Path(__file__).resolve().parents[1]
+        shutil.copy2(actual/'buildscripts/build.sh',scripts/'build.sh')
+        shutil.copy2(Path(__file__).with_name('engine-cache.py'),tools/'engine-cache.py')
+        for name in ('CMakeLists.txt','performance-engine.json'):shutil.copy2(self.root/name,scripts/name)
+        for name in ('version.sh','download-ndk.sh','setup-ndk.sh','setup-icu.sh'):
+            path=scripts/'include'/name;path.write_text('#!/bin/bash\ntrue\n');path.chmod(0o755)
+        (scripts/'include/command_wrapper_head.sh.in').write_text('#!/bin/bash\ntrue\n')
+        (scripts/'include/command_wrapper_tail.sh.in').write_text('true\n')
+        for name,body in [('cmake','echo REACHED_CMAKE\nexit 79\n'),('envsubst','cat\n')]:
+            path=fakebin/name;path.write_text('#!/bin/bash\n'+body);path.chmod(0o755)
+        sdk=scripts/'build/arm64/boost-prefix/keep.o';sdk.parent.mkdir(parents=True);sdk.write_bytes(b'sdk')
+        old=scripts/'build/arm64/openmw-prefix/stale.o';old.parent.mkdir(parents=True);old.write_bytes(b'old-engine')
+        result=subprocess.run(['bash',str(scripts/'build.sh'),'--arch','arm64','--release','--lto','--jobs','2'],env={**os.environ,'PATH':str(fakebin)+os.pathsep+os.environ['PATH']},stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=30)
+        self.assertEqual(result.returncode,79,result.stdout);self.assertIn('REACHED_CMAKE',result.stdout)
+        self.assertEqual(result.stdout.count('Engine cache:'),1,result.stdout)
+        self.assertTrue((scripts/'prefix/arm64/lib').is_dir());self.assertTrue((scripts/'prefix/arm64/osg/lib').is_dir())
+        self.assertEqual(sdk.read_bytes(),b'sdk');self.assertFalse(old.exists())
+
     @unittest.skipIf(os.name=='nt','Symlink creation needs additional Windows privileges')
     def test_symlink_cannot_redirect_cache_deletion(self):
         outside=self.root/'outside';outside.mkdir();important=outside/'keep';important.write_text('safe')
