@@ -52,12 +52,6 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: android-gradle-v1-${{ hashFiles('source/**/*.gradle', 'source/gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Prepare native dependencies
-        if: ${{ inputs.dependencies_only }}
-        working-directory: source/buildscripts
-        run: |
-          chmod +x build.sh include/*.sh
-          ./build.sh --arch arm64 --release --lto --jobs 4 --deps-only 2>&1 | tee performance-native-build.log
       - name: Cache verified Boost release asset
         env:
           GH_TOKEN: ${{ github.token }}
@@ -77,6 +71,12 @@ jobs:
               --pattern "$archive_name" --output "$archive_path" --clobber
           fi
           printf '%s  %s\n' "$boost_sha256" "$archive_path" | sha256sum --check
+      - name: Prepare native dependencies
+        if: ${{ inputs.dependencies_only }}
+        working-directory: source/buildscripts
+        run: |
+          chmod +x build.sh include/*.sh
+          ./build.sh --arch arm64 --release --lto --jobs 4 --deps-only 2>&1 | tee performance-native-build.log
       - name: Provide linker memory headroom
         if: ${{ !inputs.dependencies_only }}
         run: |
