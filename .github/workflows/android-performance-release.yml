@@ -17,6 +17,8 @@ jobs:
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
+      - name: Test native engine cache freshness
+        run: python3 -B source/tools/test-engine-cache.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

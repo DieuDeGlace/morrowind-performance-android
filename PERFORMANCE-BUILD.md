@@ -167,3 +167,11 @@ Native items yield automatically when LuaPhysicsEngine.omwscripts or its engine
 scripts are configured. Disable that manifest to use native items; its installed
 asset data folder can remain enabled for debris. Actor ragdolls remain available.
 Preview 3's shared settings and saves default is preserved.
+
+
+Native engine cache reuse now requires matching source/archive pin, build flags,
+CMake/toolchain inputs and built-library checksum. A changed or unknown pin
+discards only the generated openmw-prefix source/build directory before CMake
+configuration; cached native dependencies remain available. A pin change during
+the build is rejected. This prevents archive timestamps from packaging an older
+physics library behind newer source metadata.
