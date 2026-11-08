@@ -109,8 +109,8 @@ save-storage change. The mod files themselves remain wherever you stored them.
 Already-deleted saves cannot be recreated by this migration.
 ## Physics preview 5: animation-guided body morph physics
 
-The native engine is pinned to f1d4f14f200a9d41503050f836a4d1d75d8d3beb, with source archive
-SHA256 f3937443e59728218cb71648dc9bf8fd016f3f96dde458dc29cb6f82e277e8da.
+The native engine is pinned to 53faef560f003cd369dd472cc7328ea2fd0c9b8a, with source archive
+SHA256 41141681a6550c1661c57416b1644797cfd33cf3bdf6cd39c3cdfa23c91a3183.
 Large deforming creature body meshes can now receive a death-only fitted skin,
 including the kwama forager and applicable bonelord, netch and mixed body rigs.
 The engine estimates bend regions and smooth weights from the installed model's
