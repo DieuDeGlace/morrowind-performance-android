@@ -132,7 +132,6 @@ class GameActivity : SDLActivity() {
             Os.setenv("LIBGL_NOHIGHP", "1", true)
         }
 
-        if (BuildConfig.IS_RAGDOLL_PREVIEW) Os.setenv("OPENMW_RAGDOLLS", "1", true)
         Os.setenv("OSG_VERTEX_BUFFER_HINT", "VBO", true)
         Os.setenv("OPENMW_USER_FILE_STORAGE", Constants.USER_FILE_STORAGE + "/", true)
         //Os.setenv("OSG_NOTIFY_LEVEL", "FATAL", true) //hide osg errors for now, gl4es bug.

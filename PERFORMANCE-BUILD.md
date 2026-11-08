@@ -175,3 +175,12 @@ discards only the generated openmw-prefix source/build directory before CMake
 configuration; cached native dependencies remain available. A pin change during
 the build is rejected. This prevents archive timestamps from packaging an older
 physics library behind newer source metadata.
+
+
+## Physics preview 6: engine defaults
+
+Actor ragdolls and native object physics are enabled by default in the shared
+engine. The Android launcher no longer needs to inject an enable flag. Custom
+environment settings still support OPENMW_RAGDOLLS=0 to disable the native
+physics backend and OPENMW_ITEMS=0 to disable only native objects. Application
+ID, signing key, shared settings and saves remain unchanged. VersionCode is 5125.
