@@ -58,6 +58,25 @@ jobs:
         run: |
           chmod +x build.sh include/*.sh
           ./build.sh --arch arm64 --release --lto --jobs 4 --deps-only 2>&1 | tee performance-native-build.log
+      - name: Cache verified Boost release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake_file=source/buildscripts/CMakeLists.txt
+          boost_version=$(sed -n 's/^set(BOOST_VERSION \(.*\))$/\1/p' "$cmake_file" | tr -d '\r')
+          boost_sha256=$(sed -n 's/^set(BOOST_HASH SHA256=\(.*\))$/\1/p' "$cmake_file" | tr -d '\r')
+          [[ "$boost_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$boost_sha256" =~ ^[0-9a-f]{64}$ ]]
+          archive_name="boost-${boost_version}.tar.gz"
+          archive_path="source/buildscripts/downloads/$archive_name"
+          mkdir -p source/buildscripts/downloads
+          if ! printf '%s  %s\n' "$boost_sha256" "$archive_path" | sha256sum --check --status; then
+            gh release download "boost-${boost_version}" --repo boostorg/boost \
+              --pattern "$archive_name" --output "$archive_path" --clobber
+          fi
+          printf '%s  %s\n' "$boost_sha256" "$archive_path" | sha256sum --check
       - name: Provide linker memory headroom
         if: ${{ !inputs.dependencies_only }}
         run: |
