@@ -38,6 +38,11 @@ if [[ "$phase" != "sign" ]]; then
     
     readelf="buildscripts/toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
     "$readelf" -h "$native_library" | grep -q 'AArch64'
+    # Reject a stale backend from a restored dependency cache. The optional
+    # engine reference must resolve to the capability query in this APK's GL.
+    "$readelf" --dyn-syms "$native_library" | grep -E 'WEAK +DEFAULT +UND +gl4es_getDepthCopySupport' > /dev/null
+    "$readelf" --dyn-syms app/src/main/jniLibs/arm64-v8a/libGL.so \
+        | grep -E 'GLOBAL +DEFAULT +[0-9]+ +gl4es_getDepthCopySupport' > /dev/null
     if "$readelf" -S "$native_library" | grep -Eq '\.debug_(info|line|str|abbrev)'; then
         echo 'Packaged native library still contains debug sections' >&2
         exit 3
@@ -68,7 +73,7 @@ rm "$release_root/aligned.apk"
 "$build_tools/aapt" dump badging "$release_root/$apk_name" | sed -n '1p' \
     > "$release_root/APK-INFO.txt"
 grep -Fq "package: name='com.dieudeglace.openmw.ragdolltest'" "$release_root/APK-INFO.txt"
-grep -Fq "versionCode='5128'" "$release_root/APK-INFO.txt"
+grep -Fq "versionCode='5129'" "$release_root/APK-INFO.txt"
 python3 - "$native_library" "$release_root/$apk_name" <<'PY'
 from pathlib import Path
 from zipfile import ZipFile

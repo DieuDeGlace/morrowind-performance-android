@@ -53,9 +53,9 @@ set(LUAJIT_VERSION 505e2c03de35e2718eef0d2d3660712e06dadf1f)
 set(LUAJIT_HASH SHA256=409f7fe570d3c16558e594421c47bdd130238323c9d6fd6c83dedd2aaeb082a8)
 
 # OpenMW 0.51 Android performance engine, including the current mobile compatibility patches.
-set(OPENMW_VERSION 57787fc937894edc0c9b1335c4f34f1f5fb6e3df)
+set(OPENMW_VERSION 5ea3bb8e20d0b33332f85d227e861d748f03770b)
 # Verify the immutable performance engine archive before compiling.
-set(OPENMW_HASH SHA256=dc6570a09465348f8036f2376cbac1307f58c88b31b2711d72210fc4719d181a)
+set(OPENMW_HASH SHA256=0dc4052cd7d0a4d29997767030d22e7c4876cb8502065020c0b5ec88440fc4c6)
 
 # https://github.com/unicode-org/icu/
 set(LIBICU_VERSION 70-1)
@@ -363,6 +363,7 @@ ExternalProject_Add(gl4es
         DOWNLOAD_DIR ${download_dir}
 
         PATCH_COMMAND python3 ${CMAKE_SOURCE_DIR}/patches/gl4es/apply-powervr-packed-depth-stencil.py <SOURCE_DIR>
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/patches/gl4es/apply-shadow-depth-copy.py <SOURCE_DIR>
 
         BUILD_COMMAND ${wrapper_command} ndk-build
         ${COMMON_NDK_BUILD_FLAGS}

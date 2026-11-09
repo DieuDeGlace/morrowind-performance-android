@@ -67,11 +67,11 @@ jobs:
             source/buildscripts/prefix
             source/buildscripts/build
           restore-keys: |
-            android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**') }}-${{ inputs.dependencies_only && 'deps' || 'engine' }}-
-            android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**') }}-
+            android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**', 'source/buildscripts/patches/gl4es/**') }}-${{ inputs.dependencies_only && 'deps' || 'engine' }}-
+            android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**', 'source/buildscripts/patches/gl4es/**') }}-
             android-arm64-native-v2-
             android-arm64-native-v1-
-          key: android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**') }}-${{ inputs.dependencies_only && 'deps' || 'engine' }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: android-arm64-native-v2-${{ hashFiles('source/buildscripts/CMakeLists.txt', 'source/buildscripts/build.sh', 'source/buildscripts/include/**', 'source/buildscripts/patches/gl4es/**') }}-${{ inputs.dependencies_only && 'deps' || 'engine' }}-${{ github.run_id }}-${{ github.run_attempt }}
       - uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
