@@ -204,3 +204,18 @@ These fixtures do not substitute for testing on an Android device.
 The native engine pin remains unchanged; this is a shader/launcher release.
 The APK keeps its application ID and signing key, with versionCode 5127, so
 it can update Physics Preview 7 in place. Uninstalling is unnecessary.
+
+
+## Physics preview 9: chronological shadows and unnamed morph rigs
+
+Both alternating render buffers of a view now share the latest shadow-map
+history. Interval 2 retains its skipped updates while walking, with separate
+uniform buffers for frames being drawn. Other views and eyes keep independent
+histories. A projection change or the existing 40 ms age limit refreshes maps.
+Eight real shadow-cull regressions cover the shared Windows and Android change.
+
+The native engine also fixes an out-of-bounds skin-transform traversal when an
+unnamed morph-generated mesh attaches directly to its skeleton, as in the supplied
+kwama forager crash. Four actual skinning regressions cover both engine branches.
+This preview uses version code 5128 and the existing preview app ID and release
+signing key, so it can update preview 8 in place without uninstalling.

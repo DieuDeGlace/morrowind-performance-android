@@ -9,7 +9,7 @@ apply plugin: 'kotlin-android'
  */
 
 def openMwVersionCode = 5121
-def ragdollPreviewVersionCode = 5127
+def ragdollPreviewVersionCode = 5128
 def openMwAndroidVersionName = '0.51.0-21-performance'
 def versionFile = new File(
         project.rootDir,
@@ -780,7 +780,7 @@ android {
         applicationId "com.dieudeglace.openmw.ragdolltest"
 
         versionCode ragdollPreviewVersionCode
-        versionName calculateVersion() + "-ragdoll-preview.8"
+        versionName calculateVersion() + "-ragdoll-preview.9"
         buildConfigField "boolean", "IS_RAGDOLL_PREVIEW", "true"
 
         minSdk 21
