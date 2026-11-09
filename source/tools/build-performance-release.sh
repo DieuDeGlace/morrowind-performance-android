@@ -37,13 +37,15 @@ if [[ "$phase" != "sign" ]]; then
     } >> app/src/main/assets/libopenmw/3rdparty-licenses.txt
     
     readelf="buildscripts/toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
-    "$readelf" -h "$native_library" | grep -q 'AArch64'
+    # Consume LLVM output completely: an early grep exit can make readelf
+    # return EX_IOERR under pipefail even when the requested field matched.
+    "$readelf" -h "$native_library" | grep -F 'AArch64' > /dev/null
     # Reject a stale backend from a restored dependency cache. The optional
     # engine reference must resolve to the capability query in this APK's GL.
     "$readelf" --dyn-syms "$native_library" | grep -E 'WEAK +DEFAULT +UND +gl4es_getDepthCopySupport' > /dev/null
     "$readelf" --dyn-syms app/src/main/jniLibs/arm64-v8a/libGL.so \
         | grep -E 'GLOBAL +DEFAULT +[0-9]+ +gl4es_getDepthCopySupport' > /dev/null
-    if "$readelf" -S "$native_library" | grep -Eq '\.debug_(info|line|str|abbrev)'; then
+    if "$readelf" -S "$native_library" | grep -E '\.debug_(info|line|str|abbrev)' > /dev/null; then
         echo 'Packaged native library still contains debug sections' >&2
         exit 3
     fi
