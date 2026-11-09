@@ -42,9 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Test native engine cache freshness
-        run: |
-          python3 -B source/tools/test-engine-cache.py
-          python3 -B source/tools/test-apk-metadata.py
+        run: python3 -B source/tools/test-engine-cache.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

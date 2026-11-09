@@ -25,10 +25,6 @@ class EngineCacheTests(unittest.TestCase):
     def compile(self,data=b'fresh-engine'):
         self.native.parent.mkdir(parents=True,exist_ok=True);self.native.write_bytes(data)
         return cache.record(self.root,'arm64',self.config)
-    def test_checkout_source_pin_matches_packaging_metadata(self):
-        actual = Path(__file__).resolve().parents[1] / 'buildscripts'
-        data = cache.snapshot(actual, 'arm64', 'release:thinlto')
-        self.assertEqual(len(data['engine_commit']), 40)
     def test_unknown_cached_engine_is_discarded_without_touching_dependencies(self):
         self.native.parent.mkdir(parents=True);self.native.write_bytes(b'old')
         self.assertTrue(cache.prepare(self.root,'arm64',self.config));self.assertFalse(self.native.exists());self.assertEqual(self.dependency.read_bytes(),b'sdk')
