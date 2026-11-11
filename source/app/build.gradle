@@ -114,7 +114,7 @@ tasks.register('verifyOpenMwPayload') {
 
         def engineMarkerFile = file('src/main/assets/libopenmw/openmw/openmw-engine-version.txt')
         def engineMarker = engineMarkerFile.getText('UTF-8').replace('\r\n', '\n').trim()
-        def requiredFinalCommit = '6d51db4fdd1901e49da824dfd4ee57bff68c43f4'
+        def requiredFinalCommit = '695d217ffd8dc537f08639132a81561fd93cfe3f'
         def expectedEngineMarker = 'OpenMW 0.53.0 Android\ncommit=' + requiredFinalCommit
 
         if (engineMarker != expectedEngineMarker) {
