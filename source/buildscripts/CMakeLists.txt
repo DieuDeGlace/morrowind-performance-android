@@ -53,9 +53,9 @@ set(LUAJIT_VERSION 505e2c03de35e2718eef0d2d3660712e06dadf1f)
 set(LUAJIT_HASH SHA256=409f7fe570d3c16558e594421c47bdd130238323c9d6fd6c83dedd2aaeb082a8)
 
 # OpenMW 0.53 Android performance engine, including the current mobile compatibility patches.
-set(OPENMW_VERSION 580564f570bf5177ebabb2223f1d4f1956797434)
+set(OPENMW_VERSION 0f32e5797483b0ee86392fc6ddc171cc7050412b)
 # Verify the immutable performance engine archive before compiling.
-set(OPENMW_HASH SHA256=c4d63706f92c7ff201521182b3d9799df0530d36710db10ab1d9fce2811168d2)
+set(OPENMW_HASH SHA256=2341d6be37b49ae30fa356d9d2b859a5884739357674e9f7f15ba297fa03b809)
 
 # https://github.com/unicode-org/icu/
 set(LIBICU_VERSION 70-1)
