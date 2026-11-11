@@ -1033,10 +1033,26 @@ class MainActivity : AppCompatActivity() {
             if (!resourcePayloadMatches(source, target)) {
                 throw IOException("OpenMW user resources still do not match the bundled runtime after rebuild")
             }
+        } else if (userResourcesStamp(target) != BuildConfig.VERSION_CODE.toString()) {
+            // Updates with the same engine version (0.53.0 to 0.53.0) pass the
+            // check above, yet can change any shader or script. Overwrite every
+            // file this APK ships; files a user added to the mirror stay.
+            Log.i(TAG, "APK updated; refreshing bundled OpenMW resources in ${target.absolutePath}")
+            if (!source.copyRecursively(target, overwrite = true)) {
+                throw IOException("Failed to refresh OpenMW user resources at ${target.absolutePath}")
+            }
         }
+        File(target, USER_RESOURCES_STAMP).writeText(BuildConfig.VERSION_CODE.toString())
 
         syncAndroidShaderCompatibilityResources()
     }
+
+    private fun userResourcesStamp(target: File): String? =
+        try {
+            File(target, USER_RESOURCES_STAMP).takeIf { it.isFile }?.readText()?.trim()
+        } catch (e: IOException) {
+            null
+        }
 
     /**
      * OpenMW 0.51 adds engine-owned Morrowind compatibility scripts below
@@ -3125,6 +3141,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "OpenMW-Launcher"
+
+        // Version code of the APK whose resources the writable mirror holds.
+        private const val USER_RESOURCES_STAMP = ".openmw-apk-version-code"
 
         // v11.x shared custom-resolution state. MouseCursor and GameActivity
         // both reference these fields, so they must remain in this companion.
