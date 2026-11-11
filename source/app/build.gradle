@@ -9,8 +9,8 @@ apply plugin: 'kotlin-android'
  */
 
 def openMwVersionCode = 5121
-def ragdollPreviewVersionCode = 5132
-def openMwAndroidVersionName = '0.51.0-21-performance'
+def ragdollPreviewVersionCode = 5133
+def openMwAndroidVersionName = '0.53.0-1-performance'
 def versionFile = new File(
         project.rootDir,
         'app/src/main/assets/libopenmw/resources/version'
@@ -25,7 +25,7 @@ def calculateVersion = {
             engineVersion = firstLine.trim()
         }
     }
-    return engineVersion == '0.51.0' ? openMwAndroidVersionName : engineVersion
+    return engineVersion == '0.53.0' ? openMwAndroidVersionName : engineVersion
 }
 
 // The final release deliberately supports ARM64 only.
@@ -114,8 +114,8 @@ tasks.register('verifyOpenMwPayload') {
 
         def engineMarkerFile = file('src/main/assets/libopenmw/openmw/openmw-engine-version.txt')
         def engineMarker = engineMarkerFile.getText('UTF-8').replace('\r\n', '\n').trim()
-        def requiredFinalCommit = 'f4bec41444214a7903bebd178389ca22ca13f646'
-        def expectedEngineMarker = 'OpenMW 0.51.0 Final\ncommit=' + requiredFinalCommit
+        def requiredFinalCommit = 'efa6ce0a246c6c4df8d440d85b5d1fff7e3b2548'
+        def expectedEngineMarker = 'OpenMW 0.53.0 Android\ncommit=' + requiredFinalCommit
 
         if (engineMarker != expectedEngineMarker) {
             def printableMarker = engineMarker.replace('\n', ' | ')
@@ -158,16 +158,16 @@ tasks.register('verifyOpenMwPayload') {
 
         def resourceVersion = file('src/main/assets/libopenmw/resources/version')
                 .getText('UTF-8').trim()
-        if (!resourceVersion.startsWith('0.51.0')) {
+        if (!resourceVersion.startsWith('0.53.0')) {
             throw new GradleException(
-                    'OpenMW resources are not from 0.51.0 Final. Actual resources/version: ' +
+                    'OpenMW resources are not from 0.53.0. Actual resources/version: ' +
                     resourceVersion
             )
         }
 
-        if (openMwVersionCode != 5121 || calculateVersion() != '0.51.0-21-performance') {
+        if (openMwVersionCode != 5121 || calculateVersion() != '0.53.0-1-performance') {
             throw new GradleException(
-                    'OpenMW Android final release identity must be versionName 0.51.0-21-performance and versionCode 5121.'
+                    'OpenMW Android release identity must be versionName 0.53.0-1-performance and versionCode 5121.'
             )
         }
 
@@ -780,7 +780,7 @@ android {
         applicationId "com.dieudeglace.openmw.ragdolltest"
 
         versionCode ragdollPreviewVersionCode
-        versionName calculateVersion() + "-ragdoll-preview.10.2"
+        versionName calculateVersion() + "-ragdoll-preview.11"
         buildConfigField "boolean", "IS_RAGDOLL_PREVIEW", "true"
 
         minSdk 21

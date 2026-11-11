@@ -247,8 +247,8 @@ if [[ $DEPLOY_RESOURCES = "true" ]]; then
 	# Immutable engine marker consumed by app/build.gradle. Prevents accidentally
 	# packaging a stale pre-0.51 libopenmw.so after this upgrade.
 	cat > "$DST/openmw/openmw-engine-version.txt" <<'EOF'
-OpenMW 0.51.0 Final
-commit=f4bec41444214a7903bebd178389ca22ca13f646
+OpenMW 0.53.0 Android
+commit=efa6ce0a246c6c4df8d440d85b5d1fff7e3b2548
 EOF
 
 	# licensing info

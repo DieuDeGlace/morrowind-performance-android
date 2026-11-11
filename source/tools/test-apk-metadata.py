@@ -36,7 +36,7 @@ versionName calculateVersion() + "-ragdoll-preview.{preview}"
         gradle = Path(__file__).resolve().parents[1] / 'app/build.gradle'
         code, name = metadata.expected_version(gradle.read_text())
         self.assertGreater(int(code), 5121)
-        self.assertTrue(name.startswith('0.51.0-21-performance-ragdoll-preview.'))
+        self.assertTrue(name.startswith('0.53.0-1-performance-ragdoll-preview.'))
 
 
 if __name__ == '__main__':

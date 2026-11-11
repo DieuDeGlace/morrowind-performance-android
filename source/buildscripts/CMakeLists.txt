@@ -52,10 +52,10 @@ set(LZ4_HASH SHA256=030644df4611007ff7dc962d981f390361e6c97a34e5cbc393ddfbe019ff
 set(LUAJIT_VERSION 505e2c03de35e2718eef0d2d3660712e06dadf1f)
 set(LUAJIT_HASH SHA256=409f7fe570d3c16558e594421c47bdd130238323c9d6fd6c83dedd2aaeb082a8)
 
-# OpenMW 0.51 Android performance engine, including the current mobile compatibility patches.
-set(OPENMW_VERSION 87ff5d9f9291724c83d10f870ba443d3dd81fec5)
+# OpenMW 0.53 Android performance engine, including the current mobile compatibility patches.
+set(OPENMW_VERSION efa6ce0a246c6c4df8d440d85b5d1fff7e3b2548)
 # Verify the immutable performance engine archive before compiling.
-set(OPENMW_HASH SHA256=7bf7ef6868ef99172af329736b34aa06e8bc2c5accb12f28d7bde34932a7b0e1)
+set(OPENMW_HASH SHA256=fe54d126d2cdcce4567d730b8c77ba815a7cc0b4dc811553d08f63486d717656)
 
 # https://github.com/unicode-org/icu/
 set(LIBICU_VERSION 70-1)
@@ -610,7 +610,7 @@ set(OPENMW_PATCH "")
 ExternalProject_Add(openmw
         DEPENDS boost openal osg mygui ffmpeg sdl2 bullet lz4 luajit libicu
 
-        URL https://github.com/DieuDeGlace/morrowind-performance/archive/${OPENMW_VERSION}.tar.gz
+        URL https://github.com/DieuDeGlace/morrowind-performance-android/archive/${OPENMW_VERSION}.tar.gz
         URL_HASH ${OPENMW_HASH}
         DOWNLOAD_DIR ${download_dir}
 
