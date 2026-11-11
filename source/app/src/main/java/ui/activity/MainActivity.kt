@@ -847,14 +847,12 @@ class MainActivity : AppCompatActivity() {
             val coreVertexText = coreVertexHeader.readText()
             val coreFragmentText = coreFragmentHeader.readText()
 
-            resourceVersion.startsWith("0.51.0") &&
+            resourceVersion.startsWith("0.53.0") &&
                 !fullscreenShader.readText().contains("uniform vec2 scaling =") &&
                 !shadowShader.readText().contains("uniform bool useDiffuseMapForShadowAlpha =") &&
                 !shadowShader.readText().contains("uniform bool alphaTestShadows =") &&
                 !debugVert.readText().contains("uniform bool useAdvancedShader =") &&
                 !debugFrag.readText().contains("uniform bool useAdvancedShader =") &&
-                objectsFragmentText.contains("OPENMW_ANDROID_051_GL4ES_EXPLICIT_OBJECT_FOG") &&
-                objectsFragmentText.contains("OPENMW_ANDROID_051_LOCALMAP_OBJECT_FOG_BYPASS_V1") &&
                 // Patch 8 ports only the proven OpenMW-0.50 Android/GL4ES
                 // normal-transform compatibility substitutions. Avoid direct
                 // gl_NormalMatrix * passNormal in these 0.51 shader stages.
@@ -866,18 +864,12 @@ class MainActivity : AppCompatActivity() {
                 bsDefaultVertexText.contains("vec3 viewNormal = normalToView(passNormal);") &&
                 bsDefaultFragmentText.contains("vec3 viewNormal = normalToView(normalize(passNormal));") &&
                 bsNoLightingVertexText.contains("vec3 viewNormal = normalize((gl_NormalMatrix * gl_Normal).xyz);") &&
-                fogShaderText.contains("OPENMW_ANDROID_051_GL4ES_EXPLICIT_OBJECT_FOG") &&
-                fogShaderText.contains("uniform float omwFogStart") &&
-                fogShaderText.contains("uniform float omwFogEnd") &&
-                // GL4ES on the Retroid/Adreno path cannot link OpenMW 0.51's
-                // helper-only shader objects. Patch 4 keeps the public helper
-                // API but inlines the implementations into the include headers.
-                !coreVertexText.contains("@link") &&
-                coreVertexText.contains("OPENMW_ANDROID_051_GL4ES_CORE_INLINE") &&
-                coreVertexText.contains("vec4 modelToClip(vec4 pos)") &&
-                !coreFragmentText.contains("@link") &&
-                coreFragmentText.contains("OPENMW_ANDROID_051_GL4ES_CORE_INLINE") &&
-                coreFragmentText.contains("vec4 sampleReflectionMap(vec2 uv)") &&
+                // OpenMW 0.53 takes fog from its own uniforms, so the fog shader
+                // no longer needs the 0.51 explicit-fog substitution.
+                fogShaderText.contains("vec4 applyFogAtPos(") &&
+                // The 0.53 headers link helper modules; the Android engine
+                // appends them to each shader at load time, so they must ship.
+                linkedShaderModulesInstalled(File(Constants.RESOURCES), coreVertexText, coreFragmentText) &&
                 // Patch 12 / Gate F: GLES2 depth textures are sampled as regular
                 // sampler2D values and compared manually; the casting shader also
                 // uses normal GLES2 near/far clipping instead of emulating GL_DEPTH_CLAMP.
@@ -963,6 +955,26 @@ class MainActivity : AppCompatActivity() {
         src.copyRecursively(dst, true)
     }
 
+    /**
+     * OpenMW 0.53's core shader headers pull lighting, material and helper code
+     * from separate modules with @link. The Android engine appends those modules
+     * to each shader when it loads them, so every linked module must be present.
+     */
+    private fun linkedShaderModulesInstalled(resources: File, coreVertexText: String, coreFragmentText: String): Boolean {
+        val modules = listOf(
+            "shaders/lib/core/vertex.glsl",
+            "shaders/lib/core/lighting_vertex.glsl",
+            "shaders/lib/core/lighting_vertex_legacy.glsl",
+            "shaders/lib/core/fragment.glsl",
+            "shaders/lib/core/lighting_fragment.glsl",
+            "shaders/lib/core/lighting_fragment_legacy.glsl",
+            "shaders/lib/material/struct.glsl"
+        )
+        return coreVertexText.contains("@link \"lib/core/vertex.glsl\"") &&
+            coreFragmentText.contains("@link \"lib/core/fragment.glsl\"") &&
+            modules.all { File(resources, it).isFile }
+    }
+
     private fun resourcePayloadMatches(source: File, target: File): Boolean {
         if (!source.isDirectory || !target.isDirectory) {
             return false
@@ -983,7 +995,7 @@ class MainActivity : AppCompatActivity() {
 
         return try {
             sourceVersion.readText().trim() == targetVersion.readText().trim() &&
-                sourceVersion.readText().trim().startsWith("0.51.0") &&
+                sourceVersion.readText().trim().startsWith("0.53.0") &&
                 sourceLogo.length() == targetLogo.length() &&
                 sourceEsmFallbacks.length() == targetEsmFallbacks.length()
         } catch (e: IOException) {
@@ -1448,11 +1460,9 @@ class MainActivity : AppCompatActivity() {
             throw IOException("Runtime OpenMW 0.51 Android GLES2 shadow compatibility/PCF shader is missing or mismatched")
         }
 
-        if (coreVertexText.contains("@link") ||
-            !coreVertexText.contains("OPENMW_ANDROID_051_GL4ES_CORE_INLINE") ||
-            coreFragmentText.contains("@link") ||
-            !coreFragmentText.contains("OPENMW_ANDROID_051_GL4ES_CORE_INLINE")) {
-            throw IOException("Runtime OpenMW 0.51 core shader helpers are not GL4ES-inline compatible")
+        if (!linkedShaderModulesInstalled(
+                File(Constants.USER_FILE_STORAGE + "/resources/"), coreVertexText, coreFragmentText)) {
+            throw IOException("Runtime OpenMW 0.53 core shader headers or their linked helper modules are missing")
         }
 
         if (!objectsVertexText.contains("vec3 viewNormal = normalToView(passNormal);") ||
@@ -1466,13 +1476,8 @@ class MainActivity : AppCompatActivity() {
             throw IOException("Runtime OpenMW 0.51 Android GL4ES normal-transform compatibility shaders are missing")
         }
 
-        if (!objectsFragmentText.contains("OPENMW_ANDROID_051_GL4ES_EXPLICIT_OBJECT_FOG") ||
-            !objectsFragmentText.contains("OPENMW_ANDROID_051_LOCALMAP_OBJECT_FOG_BYPASS_V1") ||
-            !fogShaderText.contains("OPENMW_ANDROID_051_GL4ES_EXPLICIT_OBJECT_FOG") ||
-            !fogShaderText.contains("uniform vec4 omwFogColor") ||
-            !fogShaderText.contains("uniform float omwFogStart") ||
-            !fogShaderText.contains("uniform float omwFogEnd")) {
-            throw IOException("Runtime OpenMW 0.51 Android explicit GL4ES object-fog/LocalMap shaders are missing")
+        if (!fogShaderText.contains("vec4 applyFogAtPos(")) {
+            throw IOException("Runtime OpenMW 0.53 fog shader is missing")
         }
 
         if (!objectsFragmentText.contains("OPENMW_ANDROID_051_GL4ES_DISABLE_ADDITIVE_FOG") ||
