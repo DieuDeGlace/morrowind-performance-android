@@ -25,8 +25,8 @@ set(FFMPEG_VERSION 6.1)
 set(FFMPEG_HASH SHA256=42093549751b582cf0f338a21a3664f52e0a9fbe0d238d3c992005e493607d0e)
 
 # https://www.libsdl.org/download-2.0.php
-set(SDL2_VERSION 2.0.22)
-set(SDL2_HASH SHA256=fe7cbf3127882e3fc7259a75a0cb585620272c51745d3852ab9dd87960697f2e)
+set(SDL2_VERSION 2.26.5)
+set(SDL2_HASH SHA256=ad8fea3da1be64c83c45b1d363a6b4ba8fd60f5bde3b23ec73855709ec5eabf7)
 
 # https://github.com/bulletphysics/bullet3/releases
 set(BULLET_VERSION 3.25)

@@ -11,7 +11,9 @@ import android.graphics.drawable.Drawable;
 import android.hardware.*;
 import android.net.Uri;
 import android.os.*;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.Selection;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
@@ -43,6 +45,115 @@ import com.libopenmw.openmw.R;
 */
 public class SDLActivity extends Activity implements View.OnSystemUiVisibilityChangeListener {
     private static final String TAG = "SDL";
+    private static final int SDL_MAJOR_VERSION = 2;
+    private static final int SDL_MINOR_VERSION = 26;
+    private static final int SDL_MICRO_VERSION = 5;
+/*
+    // Display InputType.SOURCE/CLASS of events and devices
+    //
+    // SDLActivity.debugSource(device.getSources(), "device[" + device.getName() + "]");
+    // SDLActivity.debugSource(event.getSource(), "event");
+    public static void debugSource(int sources, String prefix) {
+        int s = sources;
+        int s_copy = sources;
+        String cls = "";
+        String src = "";
+        int tst = 0;
+        int FLAG_TAINTED = 0x80000000;
+
+        if ((s & InputDevice.SOURCE_CLASS_BUTTON) != 0)     cls += " BUTTON";
+        if ((s & InputDevice.SOURCE_CLASS_JOYSTICK) != 0)   cls += " JOYSTICK";
+        if ((s & InputDevice.SOURCE_CLASS_POINTER) != 0)    cls += " POINTER";
+        if ((s & InputDevice.SOURCE_CLASS_POSITION) != 0)   cls += " POSITION";
+        if ((s & InputDevice.SOURCE_CLASS_TRACKBALL) != 0)  cls += " TRACKBALL";
+
+
+        int s2 = s_copy & ~InputDevice.SOURCE_ANY; // keep class bits
+        s2 &= ~(  InputDevice.SOURCE_CLASS_BUTTON
+                | InputDevice.SOURCE_CLASS_JOYSTICK
+                | InputDevice.SOURCE_CLASS_POINTER
+                | InputDevice.SOURCE_CLASS_POSITION
+                | InputDevice.SOURCE_CLASS_TRACKBALL);
+
+        if (s2 != 0) cls += "Some_Unkown";
+
+        s2 = s_copy & InputDevice.SOURCE_ANY; // keep source only, no class;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            tst = InputDevice.SOURCE_BLUETOOTH_STYLUS;
+            if ((s & tst) == tst) src += " BLUETOOTH_STYLUS";
+            s2 &= ~tst;
+        }
+
+        tst = InputDevice.SOURCE_DPAD;
+        if ((s & tst) == tst) src += " DPAD";
+        s2 &= ~tst;
+
+        tst = InputDevice.SOURCE_GAMEPAD;
+        if ((s & tst) == tst) src += " GAMEPAD";
+        s2 &= ~tst;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            tst = InputDevice.SOURCE_HDMI;
+            if ((s & tst) == tst) src += " HDMI";
+            s2 &= ~tst;
+        }
+
+        tst = InputDevice.SOURCE_JOYSTICK;
+        if ((s & tst) == tst) src += " JOYSTICK";
+        s2 &= ~tst;
+
+        tst = InputDevice.SOURCE_KEYBOARD;
+        if ((s & tst) == tst) src += " KEYBOARD";
+        s2 &= ~tst;
+
+        tst = InputDevice.SOURCE_MOUSE;
+        if ((s & tst) == tst) src += " MOUSE";
+        s2 &= ~tst;
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            tst = InputDevice.SOURCE_MOUSE_RELATIVE;
+            if ((s & tst) == tst) src += " MOUSE_RELATIVE";
+            s2 &= ~tst;
+
+            tst = InputDevice.SOURCE_ROTARY_ENCODER;
+            if ((s & tst) == tst) src += " ROTARY_ENCODER";
+            s2 &= ~tst;
+        }
+        tst = InputDevice.SOURCE_STYLUS;
+        if ((s & tst) == tst) src += " STYLUS";
+        s2 &= ~tst;
+
+        tst = InputDevice.SOURCE_TOUCHPAD;
+        if ((s & tst) == tst) src += " TOUCHPAD";
+        s2 &= ~tst;
+
+        tst = InputDevice.SOURCE_TOUCHSCREEN;
+        if ((s & tst) == tst) src += " TOUCHSCREEN";
+        s2 &= ~tst;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            tst = InputDevice.SOURCE_TOUCH_NAVIGATION;
+            if ((s & tst) == tst) src += " TOUCH_NAVIGATION";
+            s2 &= ~tst;
+        }
+
+        tst = InputDevice.SOURCE_TRACKBALL;
+        if ((s & tst) == tst) src += " TRACKBALL";
+        s2 &= ~tst;
+
+        tst = InputDevice.SOURCE_ANY;
+        if ((s & tst) == tst) src += " ANY";
+        s2 &= ~tst;
+
+        if (s == FLAG_TAINTED) src += " FLAG_TAINTED";
+        s2 &= ~FLAG_TAINTED;
+
+        if (s2 != 0) src += " Some_Unkown";
+
+        Log.v(TAG, prefix + "int=" + s_copy + " CLASS={" + cls + " } source(s):" + src);
+    }
+*/
 
     public static boolean mIsResumedCalled, mHasFocus;
     public static final boolean mHasMultiWindow = (Build.VERSION.SDK_INT >= 24);
@@ -206,6 +317,10 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         mNextNativeState = NativeState.INIT;
         mCurrentNativeState = NativeState.INIT;
     }
+    
+    protected SDLSurface createSDLSurface(Context context) {
+        return new SDLSurface(context);
+    }
 
     // Setup
     @Override
@@ -236,8 +351,18 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             errorMsgBrokenLib = e.getMessage();
         }
 
-        if (mBrokenLibraries)
-        {
+        if (!mBrokenLibraries) {
+            String expected_version = String.valueOf(SDL_MAJOR_VERSION) + "." +
+                                      String.valueOf(SDL_MINOR_VERSION) + "." +
+                                      String.valueOf(SDL_MICRO_VERSION);
+            String version = nativeGetVersion();
+            if (!version.equals(expected_version)) {
+                mBrokenLibraries = true;
+                errorMsgBrokenLib = "SDL C/Java version mismatch (expected " + expected_version + ", got " + version + ")";
+            }
+        }
+
+        if (mBrokenLibraries) {
             mSingleton = this;
             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
             dlgAlert.setMessage(getString(R.string.sdl_start_error, errorMsgBrokenLib));
@@ -271,7 +396,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         mHIDDeviceManager = HIDDeviceManager.acquire(this);
 
         // Set up the surface
-        mSurface = new SDLSurface(getApplication());
+        mSurface = createSDLSurface(getApplication());
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
@@ -792,6 +917,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     }
 
     // C functions we call
+    public static native String nativeGetVersion();
     public static native int nativeInit();
     public static native int nativeSetupJNI();
     public static native int nativeRunMain(String library, String function, Object arguments);
@@ -1153,9 +1279,8 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     }
 
     // This method is called by SDLControllerManager's API 26 Generic Motion Handler.
-    public static View getContentView()
-    {
-        return mSingleton.mLayout;
+    public static View getContentView() {
+        return mLayout;
     }
 
     static class ShowTextInputTask implements Runnable {
@@ -1603,6 +1728,77 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         }
 
         return event.isPrintingKey() || event.getKeyCode() == KeyEvent.KEYCODE_SPACE;
+    }
+
+    public static boolean handleKeyEvent(View v, int keyCode, KeyEvent event, InputConnection ic) {
+        int deviceId = event.getDeviceId();
+        int source = event.getSource();
+
+        if (source == InputDevice.SOURCE_UNKNOWN) {
+            InputDevice device = InputDevice.getDevice(deviceId);
+            if (device != null) {
+                source = device.getSources();
+            }
+        }
+
+//        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+//            Log.v("SDL", "key down: " + keyCode + ", deviceId = " + deviceId + ", source = " + source);
+//        } else if (event.getAction() == KeyEvent.ACTION_UP) {
+//            Log.v("SDL", "key up: " + keyCode + ", deviceId = " + deviceId + ", source = " + source);
+//        }
+
+        // Dispatch the different events depending on where they come from
+        // Some SOURCE_JOYSTICK, SOURCE_DPAD or SOURCE_GAMEPAD are also SOURCE_KEYBOARD
+        // So, we try to process them as JOYSTICK/DPAD/GAMEPAD events first, if that fails we try them as KEYBOARD
+        //
+        // Furthermore, it's possible a game controller has SOURCE_KEYBOARD and
+        // SOURCE_JOYSTICK, while its key events arrive from the keyboard source
+        // So, retrieve the device itself and check all of its sources
+        if (SDLControllerManager.isDeviceSDLJoystick(deviceId)) {
+            // Note that we process events with specific key codes here
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (SDLControllerManager.onNativePadDown(deviceId, keyCode) == 0) {
+                    return true;
+                }
+            } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                if (SDLControllerManager.onNativePadUp(deviceId, keyCode) == 0) {
+                    return true;
+                }
+            }
+        }
+
+        if ((source & InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (isTextInputEvent(event)) {
+                    if (ic != null) {
+                        ic.commitText(String.valueOf((char) event.getUnicodeChar()), 1);
+                    } else {
+                        SDLInputConnection.nativeCommitText(String.valueOf((char) event.getUnicodeChar()), 1);
+                    }
+                }
+                onNativeKeyDown(keyCode);
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                onNativeKeyUp(keyCode);
+                return true;
+            }
+        }
+
+        if ((source & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE) {
+            // on some devices key events are sent for mouse BUTTON_BACK/FORWARD presses
+            // they are ignored here because sending them as mouse input to SDL is messy
+            if ((keyCode == KeyEvent.KEYCODE_BACK) || (keyCode == KeyEvent.KEYCODE_FORWARD)) {
+                switch (event.getAction()) {
+                case KeyEvent.ACTION_DOWN:
+                case KeyEvent.ACTION_UP:
+                    // mark the event as handled or it will be handled by system
+                    // handling KEYCODE_BACK by system will call onBackPressed()
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -2978,21 +3174,7 @@ class DummyEdit extends View implements View.OnKeyListener {
             return true;
         }
 
-        /*
-         * This handles the hardware keyboard input
-         */
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (SDLActivity.isTextInputEvent(event)) {
-                ic.commitText(String.valueOf((char) event.getUnicodeChar()), 1);
-                return true;
-            }
-            SDLActivity.onNativeKeyDown(keyCode);
-            return true;
-        } else if (event.getAction() == KeyEvent.ACTION_UP) {
-            SDLActivity.onNativeKeyUp(keyCode);
-            return true;
-        }
-        return false;
+        return SDLActivity.handleKeyEvent(v, keyCode, event, ic);
     }
 
     //
@@ -3016,9 +3198,10 @@ class DummyEdit extends View implements View.OnKeyListener {
     public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
         ic = new SDLInputConnection(this, true);
 
-        outAttrs.inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
-        outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI
-                | EditorInfo.IME_FLAG_NO_FULLSCREEN /* API 11 */;
+        outAttrs.inputType = InputType.TYPE_CLASS_TEXT |
+                             InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+        outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI |
+                              EditorInfo.IME_FLAG_NO_FULLSCREEN /* API 11 */;
 
         return ic;
     }
@@ -3026,9 +3209,17 @@ class DummyEdit extends View implements View.OnKeyListener {
 
 class SDLInputConnection extends BaseInputConnection {
 
+    protected EditText mEditText;
+    protected String mCommittedText = "";
+
     public SDLInputConnection(View targetView, boolean fullEditor) {
         super(targetView, fullEditor);
+        mEditText = new EditText(SDL.getContext());
+    }
 
+    @Override
+    public Editable getEditable() {
+        return mEditText.getEditableText();
     }
 
     @Override
@@ -3051,59 +3242,84 @@ class SDLInputConnection extends BaseInputConnection {
             }
         }
 
-
         return super.sendKeyEvent(event);
     }
 
     @Override
     public boolean commitText(CharSequence text, int newCursorPosition) {
-
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (c == '\n') {
-                if (SDLActivity.onNativeSoftReturnKey()) {
-                    return true;
-                }
-            }
-            nativeGenerateScancodeForUnichar(c);
+        if (!super.commitText(text, newCursorPosition)) {
+            return false;
         }
-
-        SDLInputConnection.nativeCommitText(text.toString(), newCursorPosition);
-
-        return super.commitText(text, newCursorPosition);
+        updateText();
+        return true;
     }
 
     @Override
     public boolean setComposingText(CharSequence text, int newCursorPosition) {
+        if (!super.setComposingText(text, newCursorPosition)) {
+            return false;
+        }
+        updateText();
+        return true;
+    }
 
-        nativeSetComposingText(text.toString(), newCursorPosition);
+    @Override
+    public boolean deleteSurroundingText(int beforeLength, int afterLength) {
+        if (!super.deleteSurroundingText(beforeLength, afterLength)) {
+            return false;
+        }
+        updateText();
+        return true;
+    }
 
-        return super.setComposingText(text, newCursorPosition);
+    protected void updateText() {
+        final Editable content = getEditable();
+        if (content == null) {
+            return;
+        }
+
+        String text = content.toString();
+        int compareLength = Math.min(text.length(), mCommittedText.length());
+        int matchLength, offset;
+
+        /* Backspace over characters that are no longer in the string */
+        for (matchLength = 0; matchLength < compareLength; ) {
+            int codePoint = mCommittedText.codePointAt(matchLength);
+            if (codePoint != text.codePointAt(matchLength)) {
+                break;
+            }
+            matchLength += Character.charCount(codePoint);
+        }
+        /* FIXME: This doesn't handle graphemes, such as emoji with a variation selector */
+        for (offset = matchLength; offset < mCommittedText.length(); ) {
+            int codePoint = mCommittedText.codePointAt(offset);
+            nativeGenerateScancodeForUnichar('\b');
+            offset += Character.charCount(codePoint);
+        }
+
+        if (matchLength < text.length()) {
+            String pendingText = text.subSequence(matchLength, text.length()).toString();
+            for (offset = 0; offset < pendingText.length(); ) {
+                int codePoint = pendingText.codePointAt(offset);
+                if (codePoint == '\n') {
+                    if (SDLActivity.onNativeSoftReturnKey()) {
+                        return;
+                    }
+                }
+                /* Higher code points don't generate simulated scancodes */
+                if (codePoint < 128) {
+                    nativeGenerateScancodeForUnichar((char)codePoint);
+                }
+                offset += Character.charCount(codePoint);
+            }
+            SDLInputConnection.nativeCommitText(pendingText, 0);
+        }
+        mCommittedText = text;
     }
 
     public static native void nativeCommitText(String text, int newCursorPosition);
 
-    public native void nativeGenerateScancodeForUnichar(char c);
-
-    public native void nativeSetComposingText(String text, int newCursorPosition);
-
-    @Override
-    public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-        // Workaround to capture backspace key. Ref: http://stackoverflow.com/questions/14560344/android-backspace-in-webview-baseinputconnection
-        // and https://bugzilla.libsdl.org/show_bug.cgi?id=2265
-        if (beforeLength > 0 && afterLength == 0) {
-            boolean ret = true;
-            // backspace(s)
-            while (beforeLength-- > 0) {
-               boolean ret_key = sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-                              && sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
-               ret = ret && ret_key;
-            }
-            return ret;
-        }
-
-        return super.deleteSurroundingText(beforeLength, afterLength);
-    }
+    public static native void nativeGenerateScancodeForUnichar(char c);
 }
 
 interface SDLClipboardHandler {
