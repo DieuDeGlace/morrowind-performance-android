@@ -9,7 +9,7 @@ apply plugin: 'kotlin-android'
  */
 
 def openMwVersionCode = 5121
-def ragdollPreviewVersionCode = 5143
+def ragdollPreviewVersionCode = 5144
 def openMwAndroidVersionName = '0.53.0-1-performance'
 def versionFile = new File(
         project.rootDir,
@@ -114,7 +114,7 @@ tasks.register('verifyOpenMwPayload') {
 
         def engineMarkerFile = file('src/main/assets/libopenmw/openmw/openmw-engine-version.txt')
         def engineMarker = engineMarkerFile.getText('UTF-8').replace('\r\n', '\n').trim()
-        def requiredFinalCommit = '987ef3c1d07be848b2b848c949fbaed4b61eb1cb'
+        def requiredFinalCommit = '99c7631bcc9be684b31b7a35534814ad82710a19'
         def expectedEngineMarker = 'OpenMW 0.53.0 Android\ncommit=' + requiredFinalCommit
 
         if (engineMarker != expectedEngineMarker) {
@@ -505,7 +505,9 @@ tasks.register('verifyOpenMwPayload') {
                 // The 0.53 engine stores ripple slopes companded in RGBA8 (ripples_normals.frag).
                 !finalWaterShader.contains('OPENMW_ANDROID_053_PACKED_RIPPLES') ||
                 // A scene depth in front of the surface must not fade the water out.
-                !finalWaterShader.contains('OPENMW_ANDROID_053_WATER_DEPTH_GUARD')) {
+                !finalWaterShader.contains('OPENMW_ANDROID_053_WATER_DEPTH_GUARD') ||
+                // gl_FragCoord is only mediump on GLES2; the surface depth must come from view space.
+                !finalWaterShader.contains('OPENMW_ANDROID_053_VIEW_SPACE_SURFACE_DEPTH')) {
             throw new GradleException(
                     'OpenMW 0.51 Android requires resolution-independent water reflection UVs plus exact WetWorld water exclusion.'
             )
@@ -784,7 +786,7 @@ android {
         applicationId "com.dieudeglace.openmw.ragdolltest"
 
         versionCode ragdollPreviewVersionCode
-        versionName calculateVersion() + "-ragdoll-preview.11.10"
+        versionName calculateVersion() + "-ragdoll-preview.11.11"
         buildConfigField "boolean", "IS_RAGDOLL_PREVIEW", "true"
 
         minSdk 21
