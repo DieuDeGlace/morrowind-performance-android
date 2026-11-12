@@ -9,7 +9,7 @@ apply plugin: 'kotlin-android'
  */
 
 def openMwVersionCode = 5121
-def ragdollPreviewVersionCode = 5140
+def ragdollPreviewVersionCode = 5141
 def openMwAndroidVersionName = '0.53.0-1-performance'
 def versionFile = new File(
         project.rootDir,
@@ -114,7 +114,7 @@ tasks.register('verifyOpenMwPayload') {
 
         def engineMarkerFile = file('src/main/assets/libopenmw/openmw/openmw-engine-version.txt')
         def engineMarker = engineMarkerFile.getText('UTF-8').replace('\r\n', '\n').trim()
-        def requiredFinalCommit = 'dee8e1fd577511704a3d7d7a7efbe6d9044d2885'
+        def requiredFinalCommit = '4299815b72cc7d085392e7b10cea9691234c4618'
         def expectedEngineMarker = 'OpenMW 0.53.0 Android\ncommit=' + requiredFinalCommit
 
         if (engineMarker != expectedEngineMarker) {
@@ -503,7 +503,9 @@ tasks.register('verifyOpenMwPayload') {
                 !finalWaterShader.contains('gl_FragData[0].a = 0.0;') ||
                 !finalWaterShader.contains('rainCombined(position.xy/1000.0, waterTimer)') ||
                 // The 0.53 engine stores ripple slopes companded in RGBA8 (ripples_normals.frag).
-                !finalWaterShader.contains('OPENMW_ANDROID_053_PACKED_RIPPLES')) {
+                !finalWaterShader.contains('OPENMW_ANDROID_053_PACKED_RIPPLES') ||
+                // A scene depth in front of the surface must not fade the water out.
+                !finalWaterShader.contains('OPENMW_ANDROID_053_WATER_DEPTH_GUARD')) {
             throw new GradleException(
                     'OpenMW 0.51 Android requires resolution-independent water reflection UVs plus exact WetWorld water exclusion.'
             )
@@ -782,7 +784,7 @@ android {
         applicationId "com.dieudeglace.openmw.ragdolltest"
 
         versionCode ragdollPreviewVersionCode
-        versionName calculateVersion() + "-ragdoll-preview.11.7"
+        versionName calculateVersion() + "-ragdoll-preview.11.8"
         buildConfigField "boolean", "IS_RAGDOLL_PREVIEW", "true"
 
         minSdk 21
