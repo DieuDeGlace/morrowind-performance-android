@@ -7,5 +7,5 @@ These three text shaders preserve its resolution-independent water reflection/re
 SHA-256 of the retained shader bytes:
 
 - `libopenmw/resources/shaders/compatibility/water.vert`: `7bb912c71050ea3fa5d9dcb04ca039fbf35abe1f681e736653b9586991085852`
-- `libopenmw/resources/shaders/compatibility/water.frag`: `2baf7349608db8f0226087a42816793f1f8f00ad13ea52e060a8f9118406b029`
+- `libopenmw/resources/shaders/compatibility/water.frag`: `907984e5d2546e475919f59517274eb3b50de4509e08426adb628b862eb01625` (upstream `2baf7349608db8f0226087a42816793f1f8f00ad13ea52e060a8f9118406b029`, then changed for the 0.53 engine's packed ripple slopes, marked `OPENMW_ANDROID_053_PACKED_RIPPLES`)
 - `libopenmw/resources/shaders/compatibility/objects.frag`: `66ebedd140696620fa0114546f50108e5ed090483463ecf8c8a5d6b4c236a178`
