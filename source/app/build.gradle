@@ -9,7 +9,7 @@ apply plugin: 'kotlin-android'
  */
 
 def openMwVersionCode = 5121
-def ragdollPreviewVersionCode = 5142
+def ragdollPreviewVersionCode = 5143
 def openMwAndroidVersionName = '0.53.0-1-performance'
 def versionFile = new File(
         project.rootDir,
@@ -114,7 +114,7 @@ tasks.register('verifyOpenMwPayload') {
 
         def engineMarkerFile = file('src/main/assets/libopenmw/openmw/openmw-engine-version.txt')
         def engineMarker = engineMarkerFile.getText('UTF-8').replace('\r\n', '\n').trim()
-        def requiredFinalCommit = '12fd0f706b67969f13c2e2959f4d8b902981bfdf'
+        def requiredFinalCommit = '987ef3c1d07be848b2b848c949fbaed4b61eb1cb'
         def expectedEngineMarker = 'OpenMW 0.53.0 Android\ncommit=' + requiredFinalCommit
 
         if (engineMarker != expectedEngineMarker) {
@@ -784,7 +784,7 @@ android {
         applicationId "com.dieudeglace.openmw.ragdolltest"
 
         versionCode ragdollPreviewVersionCode
-        versionName calculateVersion() + "-ragdoll-preview.11.9"
+        versionName calculateVersion() + "-ragdoll-preview.11.10"
         buildConfigField "boolean", "IS_RAGDOLL_PREVIEW", "true"
 
         minSdk 21
