@@ -248,7 +248,7 @@ if [[ $DEPLOY_RESOURCES = "true" ]]; then
 	# packaging a stale pre-0.51 libopenmw.so after this upgrade.
 	cat > "$DST/openmw/openmw-engine-version.txt" <<'EOF'
 OpenMW 0.53.0 Android
-commit=35add5c16da0e019510dace8ebc825143107efea
+commit=1333b42f6f54a486175cff189df770caf29d119e
 EOF
 
 	# licensing info
