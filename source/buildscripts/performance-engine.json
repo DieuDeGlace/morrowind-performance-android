@@ -1,10 +1,10 @@
 {
-  "engine_commit": "0a99bd8fc44b0847de1c77e1650308bdec6ce6a9",
-  "engine_archive_sha256": "cbfcca448656766433673b015e67e81c66283664ff866bc69e9c78792e31cf1f",
+  "engine_commit": "0f73f1ad13026b756a7b1144797f00e0b2c5da3b",
+  "engine_archive_sha256": "3c17bdea3688e4bd7e5c6253f4ea749d4e0642726c23cbc6456887fe3f705a59",
   "engine_repository": "DieuDeGlace/morrowind-performance-android engine-0.53",
   "engine_base": "OpenMW 0.53 development",
-  "engine_history_commit": "196f3085c5ecced985396dbb1d1554ba53c3e345",
-  "previous_android_engine_commit": "37c4a3c909e9f0d1f561670dad6d38f1434fc622",
+  "engine_history_commit": "12811fbf155ba3dc5c779a05f3accd165dbabbc0",
+  "previous_android_engine_commit": "0a99bd8fc44b0847de1c77e1650308bdec6ce6a9",
   "performance_source_commit": "fefb35e4a51c98da305c2b6031af34666973d84f",
   "android_source": "Andiweli/OpenMW-Android main"
 }
