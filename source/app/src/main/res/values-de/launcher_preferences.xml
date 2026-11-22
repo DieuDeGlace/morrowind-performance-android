@@ -96,6 +96,8 @@
     <string name="gs_soft_particles_summary">Weicht Übergänge zwischen transparenten Partikelsystemen und undurchsichtiger Geometrie auf.</string>
     <string name="gs_transparent_postpass_title">Transparenz-Postpass</string>
     <string name="gs_transparent_postpass_summary">Transparenter Tiefen-Postpass. Rendert transparente Objekte erneut und erzwingt Alpha-Clipping mit einem festen Schwellenwert.</string>
+    <string name="gs_temporal_antialiasing_title">Temporales Anti-Aliasing</string>
+    <string name="gs_temporal_antialiasing_summary">Glättet gezackte und flimmernde Kanten, indem jedes Bild mit den vorherigen Bildern gemischt wird. Kostet etwas Leistung; auf langsameren Geräten ausschalten.</string>
     <string name="pref_game_settings_title">Spieleinstellungen</string>
     <string name="pref_game_settings_summary">Gameplay, Grafik, Schatten, Animationen, Oberfläche und Engine konfigurieren.</string>
     <string name="pref_mods_summary">Mods zu OpenMW hinzufügen.</string>

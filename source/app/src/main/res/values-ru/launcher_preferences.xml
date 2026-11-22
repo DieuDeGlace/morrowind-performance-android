@@ -96,6 +96,8 @@
     <string name="gs_soft_particles_summary">Смягчает пересечения смешиваемых систем частиц с непрозрачной геометрией.</string>
     <string name="gs_transparent_postpass_title">Прозрачный постпроход</string>
     <string name="gs_transparent_postpass_summary">Прозрачный постпроход глубины. Повторно отрисовывает прозрачные объекты с принудительным alpha clipping и фиксированным порогом.</string>
+    <string name="gs_temporal_antialiasing_title">Временное сглаживание (TAA)</string>
+    <string name="gs_temporal_antialiasing_summary">Сглаживает зубчатые и мерцающие края, смешивая каждый кадр с предыдущими. Немного снижает производительность; отключите на медленных устройствах.</string>
     <string name="pref_game_settings_title">Настройки игры</string>
     <string name="pref_game_settings_summary">Настройка игрового процесса, графики, теней, анимаций, интерфейса и параметров движка.</string>
     <string name="pref_mods_summary">Добавить моды в OpenMW</string>

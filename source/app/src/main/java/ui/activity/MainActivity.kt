@@ -2494,6 +2494,7 @@ class MainActivity : AppCompatActivity() {
 			// Visuals PostProcessing
                         "soft particles" to if(prefs.getBoolean("gs_soft_particles", false)) "true" else "false",
                         "transparent postpass" to if(prefs.getBoolean("gs_transparent_postpass", false)) "true" else "false",
+                        "temporal antialiasing" to if(prefs.getBoolean("gs_temporal_antialiasing", true)) "true" else "false",
 
 			// Animations
                         "use magic item animations" to if(prefs.getBoolean("gs_use_magic_item_animation", false)) "true" else "false",

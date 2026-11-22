@@ -96,6 +96,8 @@
     <string name="gs_soft_particles_summary">Mjukar upp skärningen mellan blandade partikelsystem och ogenomskinlig geometri.</string>
     <string name="gs_transparent_postpass_title">Transparent efterpass</string>
     <string name="gs_transparent_postpass_summary">Transparent djupefterpass. Ritar om transparenta objekt med tvingad alpha clipping och ett fast tröskelvärde.</string>
+    <string name="gs_temporal_antialiasing_title">Temporal kantutjämning</string>
+    <string name="gs_temporal_antialiasing_summary">Jämnar ut hackiga och flimrande kanter genom att blanda varje bild med de föregående. Kostar lite prestanda; stäng av på långsammare enheter.</string>
     <string name="pref_game_settings_title">Spelinställningar</string>
     <string name="pref_game_settings_summary">Konfigurera spelmekanik, grafik, skuggor, animationer, gränssnitt och motorinställningar.</string>
     <string name="pref_mods_summary">Lägg till moddar i OpenMW</string>

@@ -96,6 +96,8 @@
     <string name="gs_soft_particles_summary">Wygładza przecięcia mieszanych systemów cząsteczek z nieprzezroczystą geometrią.</string>
     <string name="gs_transparent_postpass_title">Przezroczysty postpass</string>
     <string name="gs_transparent_postpass_summary">Przezroczysty postpass głębokości. Ponownie renderuje przezroczyste obiekty z wymuszonym alpha clippingiem o stałym progu.</string>
+    <string name="gs_temporal_antialiasing_title">Wygładzanie czasowe (TAA)</string>
+    <string name="gs_temporal_antialiasing_summary">Wygładza poszarpane i migoczące krawędzie, łącząc każdą klatkę z poprzednimi. Kosztuje nieco wydajności; wyłącz na wolniejszych urządzeniach.</string>
     <string name="pref_game_settings_title">Ustawienia gry</string>
     <string name="pref_game_settings_summary">Konfiguruj rozgrywkę, grafikę, cienie, animacje, interfejs i ustawienia silnika.</string>
     <string name="pref_mods_summary">Dodaj mody do OpenMW</string>

@@ -96,6 +96,8 @@
     <string name="gs_soft_particles_summary">Adoucit l’intersection des systèmes de particules mélangées avec la géométrie opaque.</string>
     <string name="gs_transparent_postpass_title">Post-passe transparente</string>
     <string name="gs_transparent_postpass_summary">Post-passe de profondeur transparente. Réaffiche les objets transparents en imposant un alpha clipping avec un seuil fixe.</string>
+    <string name="gs_temporal_antialiasing_title">Anticrénelage temporel</string>
+    <string name="gs_temporal_antialiasing_summary">Adoucit les bords crénelés et scintillants en mélangeant chaque image avec les images précédentes. Coûte un peu de performance ; désactivez-le sur les appareils plus lents.</string>
     <string name="pref_game_settings_title">Paramètres du jeu</string>
     <string name="pref_game_settings_summary">Configure le gameplay, les graphismes, les ombres, les animations, l’interface et les réglages du moteur.</string>
     <string name="pref_mods_summary">Ajouter des mods à OpenMW</string>

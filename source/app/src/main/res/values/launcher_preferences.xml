@@ -96,6 +96,8 @@
     <string name="gs_soft_particles_summary">Soften intersection of blended particle systems with opaque geometry.</string>
     <string name="gs_transparent_postpass_title">Transparent Postpass</string>
     <string name="gs_transparent_postpass_summary">Transparent depth postpass. Re-renders transparent objects with alpha-clipping forced with a fixed threshold.</string>
+    <string name="gs_temporal_antialiasing_title">Temporal anti-aliasing</string>
+    <string name="gs_temporal_antialiasing_summary">Smooths jagged and shimmering edges by blending each frame with the previous frames. Costs some performance; turn it off on slower devices.</string>
     <string name="pref_game_settings_title">Game Settings</string>
     <string name="pref_game_settings_summary">Configure gameplay, visuals, shadows, animations, interface, and engine settings.</string>
     <string name="pref_mods_summary">Add mods to OpenMW</string>
